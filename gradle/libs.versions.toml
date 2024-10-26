@@ -15,7 +15,7 @@ modmenu = "12.0.0-beta.1"
 nightconfig = "3.8.1"
 
 # Gradle
-gradle-licenser = "1.2.+"
+gradle-licenser = "2.0.+"
 gradle-loom = "1.8.+"
 mappingio = "0.6.1"
 
