@@ -6,7 +6,7 @@ import net.darkhax.curseforgegradle.TaskPublishCurseForge
 plugins {
 	id("lambdynamiclights")
 	`maven-publish`
-	id("com.github.johnrengelman.shadow").version("8.1.1")
+	id("com.gradleup.shadow").version("8.3.3")
 	id("com.modrinth.minotaur").version("2.+")
 	id("net.darkhax.curseforgegradle").version("1.1.+")
 }
@@ -85,10 +85,11 @@ dependencies {
 }
 
 tasks.processResources {
-	inputs.property("version", project.version)
+	val version = project.version
+	inputs.property("version", version)
 
 	filesMatching("fabric.mod.json") {
-		expand("version" to project.version)
+		expand("version" to version)
 	}
 }
 
