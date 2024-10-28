@@ -12,6 +12,8 @@ package dev.lambdaurora.lambdynlights;
 import dev.lambdaurora.lambdynlights.accessor.WorldRendererAccessor;
 import dev.lambdaurora.lambdynlights.api.DynamicLightHandlers;
 import dev.lambdaurora.lambdynlights.api.DynamicLightsInitializer;
+import dev.lambdaurora.lambdynlights.engine.DynamicLightSource;
+import dev.lambdaurora.lambdynlights.engine.DynamicLightSourceBehavior;
 import dev.lambdaurora.lambdynlights.engine.DynamicLightingEngine;
 import dev.lambdaurora.lambdynlights.resource.item.ItemLightSources;
 import dev.yumi.commons.event.EventManager;
@@ -54,7 +56,7 @@ import java.util.function.Predicate;
  * Represents the LambDynamicLights mod.
  *
  * @author LambdAurora
- * @version 3.1.1
+ * @version 3.3.0
  * @since 1.0.0
  */
 public class LambDynLights implements ClientModInitializer {
@@ -63,9 +65,9 @@ public class LambDynLights implements ClientModInitializer {
 	private static LambDynLights INSTANCE;
 	public final DynamicLightsConfig config = new DynamicLightsConfig(this);
 	public final ItemLightSources itemLightSources = new ItemLightSources();
-	private final DynamicLightingEngine engine = new DynamicLightingEngine();
-	private final Set<DynamicLightSource> dynamicLightSources = new HashSet<>();
-	private final List<DynamicLightSource> toClear = new ArrayList<>();
+	public final DynamicLightingEngine engine = new DynamicLightingEngine();
+	private final Set<DynamicLightSourceBehavior> dynamicLightSources = new HashSet<>();
+	private final List<DynamicLightSourceBehavior> toClear = new ArrayList<>();
 	private final ReentrantReadWriteLock lightSourcesLock = new ReentrantReadWriteLock();
 	private long lastUpdate = System.currentTimeMillis();
 	private int lastUpdateCount = 0;
@@ -187,8 +189,8 @@ public class LambDynLights implements ClientModInitializer {
 	 *
 	 * @param lightSource the light source to add
 	 */
-	public void addLightSource(@NotNull DynamicLightSource lightSource) {
-		if (!lightSource.getDynamicLightLevel().isClientSide())
+	public void addLightSource(@NotNull DynamicLightSourceBehavior lightSource) {
+		if (!lightSource.dynamicLightWorld().isClientSide())
 			return;
 		if (!this.config.getDynamicLightsMode().isEnabled())
 			return;
@@ -204,7 +206,7 @@ public class LambDynLights implements ClientModInitializer {
 	 * @return {@code true} if the light source is tracked, else {@code false}
 	 */
 	public boolean containsLightSource(@NotNull DynamicLightSource lightSource) {
-		if (!lightSource.getDynamicLightLevel().isClientSide())
+		if (!lightSource.dynamicLightWorld().isClientSide())
 			return false;
 
 		return this.dynamicLightSources.contains(lightSource);
@@ -224,7 +226,7 @@ public class LambDynLights implements ClientModInitializer {
 	 *
 	 * @param lightSource the light source to remove
 	 */
-	public void removeLightSource(@NotNull DynamicLightSource lightSource) {
+	public void removeLightSource(@NotNull DynamicLightSourceBehavior lightSource) {
 		var dynamicLightSources = this.dynamicLightSources.iterator();
 		DynamicLightSource it;
 		while (dynamicLightSources.hasNext()) {
@@ -242,7 +244,7 @@ public class LambDynLights implements ClientModInitializer {
 	 */
 	public void clearLightSources() {
 		var dynamicLightSources = this.dynamicLightSources.iterator();
-		DynamicLightSource it;
+		DynamicLightSourceBehavior it;
 		while (dynamicLightSources.hasNext()) {
 			it = dynamicLightSources.next();
 			dynamicLightSources.remove();
@@ -257,9 +259,9 @@ public class LambDynLights implements ClientModInitializer {
 	 *
 	 * @param filter the removal filter
 	 */
-	public void removeLightSources(@NotNull Predicate<DynamicLightSource> filter) {
+	public void removeLightSources(@NotNull Predicate<DynamicLightSourceBehavior> filter) {
 		var dynamicLightSources = this.dynamicLightSources.iterator();
-		DynamicLightSource it;
+		DynamicLightSourceBehavior it;
 		while (dynamicLightSources.hasNext()) {
 			it = dynamicLightSources.next();
 			if (filter.test(it)) {
@@ -382,7 +384,7 @@ public class LambDynLights implements ClientModInitializer {
 	 *
 	 * @param lightSource the light source
 	 */
-	public static void updateTracking(@NotNull DynamicLightSource lightSource) {
+	public static void updateTracking(@NotNull DynamicLightSourceBehavior lightSource) {
 		boolean enabled = lightSource.isDynamicLightEnabled();
 		int luminance = lightSource.getLuminance();
 

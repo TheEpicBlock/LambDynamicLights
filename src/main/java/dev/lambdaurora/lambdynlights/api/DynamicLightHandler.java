@@ -10,6 +10,7 @@
 package dev.lambdaurora.lambdynlights.api;
 
 import dev.lambdaurora.lambdynlights.LambDynLights;
+import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Creeper;
@@ -23,7 +24,7 @@ import java.util.function.Function;
  *
  * @param <T> The type of the light source.
  * @author LambdAurora
- * @version 3.1.2
+ * @version 3.3.0
  * @since 1.1.0
  */
 public interface DynamicLightHandler<T> {
@@ -116,6 +117,31 @@ public interface DynamicLightHandler<T> {
 			@Override
 			public boolean isWaterSensitive(T lightSource) {
 				return true;
+			}
+		};
+	}
+
+	/**
+	 * {@return a dynamic light handler for display entities}
+	 *
+	 * @param handler the base handler of the display entity
+	 * @param <T> the display entity type
+	 * @since 3.3.0
+	 */
+	static <T extends Display> @NotNull DynamicLightHandler<T> makeDisplayEntityHandler(@NotNull DynamicLightHandler<T> handler) {
+		return new DynamicLightHandler<>() {
+			@Override
+			public int getLuminance(T entity) {
+				if (entity.getPackedBrightnessOverride() != -1) {
+					return 0;
+				}
+
+				return handler.getLuminance(entity);
+			}
+
+			@Override
+			public boolean isWaterSensitive(T lightSource) {
+				return handler.isWaterSensitive(lightSource);
 			}
 		};
 	}

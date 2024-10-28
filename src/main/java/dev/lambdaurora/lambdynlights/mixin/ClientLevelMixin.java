@@ -9,7 +9,7 @@
 
 package dev.lambdaurora.lambdynlights.mixin;
 
-import dev.lambdaurora.lambdynlights.DynamicLightSource;
+import dev.lambdaurora.lambdynlights.engine.DynamicLightSourceBehavior;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.entity.LevelEntityGetter;
@@ -24,11 +24,27 @@ public abstract class ClientLevelMixin {
 	@Shadow
 	protected abstract LevelEntityGetter<Entity> getEntities();
 
+	@Inject(
+			method = "tickNonPassenger",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V", shift = At.Shift.AFTER)
+	)
+	private void lambdynlights$onTickNonPassenger(Entity entity, CallbackInfo ci) {
+		DynamicLightSourceBehavior.tickEntity(entity);
+	}
+
+	@Inject(
+			method = "tickPassenger",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;rideTick()V", shift = At.Shift.AFTER)
+	)
+	private void lambdynlights$onTickPassenger(Entity vehicle, Entity passenger, CallbackInfo ci) {
+		DynamicLightSourceBehavior.tickEntity(passenger);
+	}
+
 	@Inject(method = "removeEntity(ILnet/minecraft/world/entity/Entity$RemovalReason;)V", at = @At("HEAD"))
-	private void onFinishRemovingEntity(int entityId, Entity.RemovalReason removalReason, CallbackInfo ci) {
+	private void lambdynlights$onFinishRemovingEntity(int entityId, Entity.RemovalReason removalReason, CallbackInfo ci) {
 		var entity = this.getEntities().get(entityId);
 		if (entity != null) {
-			var dls = (DynamicLightSource) entity;
+			var dls = (DynamicLightSourceBehavior) entity;
 			dls.setDynamicLightEnabled(false);
 		}
 	}

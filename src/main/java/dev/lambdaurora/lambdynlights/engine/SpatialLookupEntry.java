@@ -9,8 +9,6 @@
 
 package dev.lambdaurora.lambdynlights.engine;
 
-import dev.lambdaurora.lambdynlights.DynamicLightSource;
-
 /**
  * Represents an entry in a spatial lookup.
  *

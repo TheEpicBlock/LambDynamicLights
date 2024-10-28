@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * @author LambdAurora
- * @version 3.2.2
+ * @version 3.3.0
  * @since 1.1.0
  */
 public final class DynamicLightHandlers {
@@ -64,6 +64,16 @@ public final class DynamicLightHandlers {
 		registerDynamicLightHandler(EntityType.SMALL_FIREBALL, DynamicLightHandler.makeHandler(ball -> 12, ball -> true));
 		registerDynamicLightHandler(EntityType.DRAGON_FIREBALL, ball -> 14);
 		registerDynamicLightHandler(EntityType.WITHER_SKULL, ball -> 12);
+
+		// Display entities
+		registerDynamicLightHandler(EntityType.BLOCK_DISPLAY,
+				DynamicLightHandler.makeDisplayEntityHandler(display -> display.getBlockState().getLightEmission())
+		);
+		registerDynamicLightHandler(EntityType.ITEM_DISPLAY,
+				DynamicLightHandler.makeDisplayEntityHandler(
+						display -> LambDynLights.getLuminanceFromItemStack(display.getItemStack(), display.isSubmergedInWater())
+				)
+		);
 	}
 
 	/**

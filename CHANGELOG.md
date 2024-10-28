@@ -232,6 +232,13 @@
 - Fixed dynamic lighting of various projectiles.
 - Fixed water-sensitive items lighting up underwater while they shouldn't.
 
+## 3.3.0
+
+- Added display entities dynamic lighting ([#209](https://github.com/LambdAurora/LambDynamicLights/issues/209)).
+  - This affects both block and item displays.
+  - If a custom brightness is defined then dynamic lighting disables itself.
+- Refactored heavily the ticking of entity dynamic lighting to make it more abstract.
+
 [SpruceUI]: https://github.com/LambdAurora/SpruceUI "SpruceUI page"
 [pridelib]: https://github.com/Queerbric/pridelib "Pridelib page"
 [Sodium]: https://modrinth.com/mod/sodium "Sodium Modrinth page"

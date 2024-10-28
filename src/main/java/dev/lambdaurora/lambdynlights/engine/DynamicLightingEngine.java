@@ -9,7 +9,6 @@
 
 package dev.lambdaurora.lambdynlights.engine;
 
-import dev.lambdaurora.lambdynlights.DynamicLightSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.math.MathHelper;
@@ -111,7 +110,7 @@ public final class DynamicLightingEngine {
 		return hash % MAX_LIGHT_SOURCES;
 	}
 
-	public void computeSpatialLookup(Collection<DynamicLightSource> dynamicLightSources) {
+	public void computeSpatialLookup(Collection<? extends DynamicLightSource> dynamicLightSources) {
 		Arrays.fill(this.spatialLookupEntries, null);
 		Arrays.fill(this.startIndices, Integer.MAX_VALUE);
 

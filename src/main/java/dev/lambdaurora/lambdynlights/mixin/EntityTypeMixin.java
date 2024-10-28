@@ -28,7 +28,8 @@ public abstract class EntityTypeMixin<T extends Entity> implements DynamicLightH
 	@Shadow
 	public abstract Text getDescription();
 
-	@Shadow public abstract String getDescriptionId();
+	@Shadow
+	public abstract String getDescriptionId();
 
 	@Unique
 	private DynamicLightHandler<T> lambdynlights$lightHandler;
