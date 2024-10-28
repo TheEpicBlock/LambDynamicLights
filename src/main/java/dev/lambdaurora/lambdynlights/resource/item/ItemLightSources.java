@@ -45,7 +45,7 @@ import java.util.concurrent.Executor;
  * Represents an item light sources manager.
  *
  * @author LambdAurora
- * @version 3.2.1
+ * @version 3.2.2
  * @since 1.3.0
  */
 public final class ItemLightSources implements ItemLightSourceManager, IdentifiableResourceReloadListener {
@@ -166,12 +166,21 @@ public final class ItemLightSources implements ItemLightSourceManager, Identifia
 	public int getLuminance(ItemStack stack, boolean submergedInWater) {
 		boolean shouldCareAboutWater = submergedInWater && LambDynLights.get().config.getWaterSensitiveCheck().get();
 
-		int luminance = Block.byItem(stack.getItem()).defaultState().getLightEmission();
+		int luminance = 0;
+		boolean matchedAny = false;
 
 		for (var data : lightSources) {
-			if (shouldCareAboutWater && data.waterSensitive()) continue;
+			if (data.predicate().test(stack)) {
+				matchedAny = true;
 
-			luminance = Math.max(luminance, data.getLuminance(stack));
+				if (shouldCareAboutWater && data.waterSensitive()) continue;
+
+				luminance = Math.max(luminance, data.getLuminance(stack));
+			}
+		}
+
+		if (!matchedAny) {
+			luminance = Block.byItem(stack.getItem()).defaultState().getLightEmission();
 		}
 
 		return luminance;

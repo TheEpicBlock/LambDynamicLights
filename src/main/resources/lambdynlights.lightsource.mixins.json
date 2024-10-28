@@ -3,7 +3,6 @@
   "package": "dev.lambdaurora.lambdynlights.mixin.lightsource",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "AbstractHurtingProjectileEntityMixin",
     "AbstractMinecartEntityMixin",
     "BlockAttachedEntityMixin",
     "EntityMixin",

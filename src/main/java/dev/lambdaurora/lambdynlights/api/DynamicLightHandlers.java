@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * @author LambdAurora
- * @version 3.2.0
+ * @version 3.2.2
  * @since 1.1.0
  */
 public final class DynamicLightHandlers {
@@ -32,7 +32,7 @@ public final class DynamicLightHandlers {
 	 * Registers the default handlers.
 	 */
 	public static void registerDefaultHandlers() {
-		registerDynamicLightHandler(EntityType.ALLAY, DynamicLightHandler.makeHandler(blaze -> 8, blaze -> true));
+		registerDynamicLightHandler(EntityType.ALLAY, allay -> 8);
 		registerDynamicLightHandler(EntityType.BLAZE, DynamicLightHandler.makeHandler(blaze -> 10, blaze -> true));
 		registerDynamicLightHandler(EntityType.CREEPER, DynamicLightHandler.makeCreeperEntityHandler(null));
 		registerDynamicLightHandler(EntityType.ENDERMAN, entity -> {
@@ -42,7 +42,8 @@ public final class DynamicLightHandlers {
 			return luminance;
 		});
 		registerDynamicLightHandler(EntityType.ITEM,
-				entity -> LambDynLights.getLuminanceFromItemStack(entity.getItem(), entity.isSubmergedInWater()));
+				entity -> LambDynLights.getLuminanceFromItemStack(entity.getItem(), entity.isSubmergedInWater())
+		);
 		registerDynamicLightHandler(EntityType.ITEM_FRAME, entity -> {
 			var world = entity.level();
 			return LambDynLights.getLuminanceFromItemStack(entity.getItem(), !world.getFluidState(entity.getBlockPos()).isEmpty());
@@ -57,6 +58,12 @@ public final class DynamicLightHandlers {
 		registerDynamicLightHandler(EntityType.GLOW_SQUID,
 				entity -> (int) MathHelper.clampedLerp(0.f, 12.f, 1.f - entity.getDarkTicksRemaining() / 10.f)
 		);
+
+		// Fireballs and other similar entities
+		registerDynamicLightHandler(EntityType.FIREBALL, DynamicLightHandler.makeHandler(ball -> 14, ball -> true));
+		registerDynamicLightHandler(EntityType.SMALL_FIREBALL, DynamicLightHandler.makeHandler(ball -> 12, ball -> true));
+		registerDynamicLightHandler(EntityType.DRAGON_FIREBALL, ball -> 14);
+		registerDynamicLightHandler(EntityType.WITHER_SKULL, ball -> 12);
 	}
 
 	/**
@@ -100,8 +107,12 @@ public final class DynamicLightHandlers {
 	 * @return {@code true} if the entity can light up, otherwise {@code false}
 	 */
 	public static <T extends Entity> boolean canLightUp(T entity) {
-		if (entity == Minecraft.getInstance().player && !LambDynLights.get().config.getSelfLightSource().get())
+		if (entity == Minecraft.getInstance().player) {
+			if (!LambDynLights.get().config.getSelfLightSource().get())
+				return false;
+		} else if (!LambDynLights.get().config.getEntitiesLightSource().get()) {
 			return false;
+		}
 
 		var setting = DynamicLightHandlerHolder.cast(entity.getType()).lambdynlights$getSetting();
 		return !(setting == null || !setting.get());

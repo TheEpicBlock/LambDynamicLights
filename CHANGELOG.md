@@ -206,6 +206,12 @@
 
 - Fixed in-world item light source data reload not applying.
 
+### 3.1.2
+
+- Added base light of 8 to allays.
+- Fixed dynamic lighting of various projectiles.
+- Fixed water-sensitive items lighting up underwater while they shouldn't.
+
 ## 3.2.0
 
 - Updated to Minecraft 1.21.2.
@@ -219,6 +225,12 @@
 
 - Same changes as v3.1.1 but for 1.21.3.
 - Fixed in-world item light source data reload not applying.
+
+### 3.2.2
+
+- Same changes as v3.1.2 but for 1.21.3.
+- Fixed dynamic lighting of various projectiles.
+- Fixed water-sensitive items lighting up underwater while they shouldn't.
 
 [SpruceUI]: https://github.com/LambdAurora/SpruceUI "SpruceUI page"
 [pridelib]: https://github.com/Queerbric/pridelib "Pridelib page"
