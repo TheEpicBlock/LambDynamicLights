@@ -206,6 +206,12 @@
 
 - Fixed in-world item light source data reload not applying.
 
+### 3.1.2
+
+- Added base light of 8 to allays.
+- Fixed dynamic lighting of various projectiles.
+- Fixed water-sensitive items lighting up underwater while they shouldn't.
+
 [SpruceUI]: https://github.com/LambdAurora/SpruceUI "SpruceUI page"
 [pridelib]: https://github.com/Queerbric/pridelib "Pridelib page"
 [Sodium]: https://modrinth.com/mod/sodium "Sodium Modrinth page"

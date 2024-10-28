@@ -10,6 +10,7 @@
 package dev.lambdaurora.lambdynlights.api;
 
 import dev.lambdaurora.lambdynlights.LambDynLights;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Creeper;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +23,7 @@ import java.util.function.Function;
  *
  * @param <T> The type of the light source.
  * @author LambdAurora
- * @version 1.3.0
+ * @version 3.1.2
  * @since 1.1.0
  */
 public interface DynamicLightHandler<T> {
@@ -52,7 +53,7 @@ public interface DynamicLightHandler<T> {
 	 * @param <T> The type of the entity.
 	 * @return The completed handler.
 	 */
-	static <T extends LivingEntity> @NotNull DynamicLightHandler<T> makeHandler(
+	static <T extends Entity> @NotNull DynamicLightHandler<T> makeHandler(
 			Function<T, Integer> luminance, Function<T, Boolean> waterSensitive
 	) {
 		return new DynamicLightHandler<>() {
