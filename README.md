@@ -129,7 +129,7 @@ GitHub
 </div>
 <!-- modrinth_exclude.long_end -->
 
-# 📖 Compatibility
+## 📖 Compatibility
 
 - [Sodium] is recommended for better performances.
 - **OptiFabric is obviously incompatible.**

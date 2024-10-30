@@ -5,6 +5,7 @@ import org.gradle.accessors.dm.LibrariesForLibs
 object Constants {
 	const val GROUP = "dev.lambdaurora"
 	const val NAME = "lambdynamiclights"
+	const val PRETTY_NAME = "LambDynamicLights"
 	const val VERSION = "3.3.0"
 	const val JAVA_VERSION = 21
 

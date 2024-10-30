@@ -38,10 +38,6 @@
   "recommends": {
     "modmenu": ">=12.0.0-beta.1"
   },
-  "suggests": {
-    "ears": "*",
-    "sodium": "*"
-  },
   "breaks": {
     "optifabric": "*"
   },
@@ -55,10 +51,6 @@
         "modmenu.bluesky": "https://bsky.app/profile/lambdaurora.dev",
         "modmenu.twitter": "https://twitter.com/LambdAurora"
       }
-    },
-    "modupdater": {
-      "strategy": "curseforge",
-      "projectID": 393442
     }
   }
 }

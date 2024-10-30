@@ -165,7 +165,7 @@ publishing {
 			artifactId = "lambdynamiclights-runtime"
 
 			pom {
-				name.set("LambDynamicLights")
+				name.set(Constants.PRETTY_NAME)
 				description.set("Adds dynamic lighting to Minecraft.")
 			}
 		}

@@ -16,7 +16,7 @@ publishing {
 			artifactId = "lambdynamiclights-api"
 
 			pom {
-				name.set("LambDynamicLights (API)")
+				name.set("${Constants.PRETTY_NAME} (API)")
 				description.set("API for LambDynamicLights, a mod which adds dynamic lighting to Minecraft.")
 			}
 		}

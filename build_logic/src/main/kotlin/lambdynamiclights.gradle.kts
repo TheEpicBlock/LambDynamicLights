@@ -63,7 +63,7 @@ tasks.jar {
 }
 
 license {
-	rule(rootProject.file("HEADER"))
+	rule(rootProject.file("metadata/HEADER"))
 }
 
 publishing {
