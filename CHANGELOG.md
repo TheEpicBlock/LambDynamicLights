@@ -232,8 +232,10 @@
 - Fixed dynamic lighting of various projectiles.
 - Fixed water-sensitive items lighting up underwater while they shouldn't.
 
-## 3.3.0
+## 4.0.0
 
+- Added the ability to define entity light sources in resource packs.
+  - Please refer yourself to the documentation for more details.
 - Added display entities dynamic lighting ([#209](https://github.com/LambdAurora/LambDynamicLights/issues/209)).
   - This affects both block and item displays.
   - If a custom brightness is defined then dynamic lighting disables itself.

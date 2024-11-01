@@ -16,13 +16,14 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
+import org.jetbrains.annotations.Range;
 
 /**
  * Represents the item light source manager,
- * which provides the ability to register light sources to items, and to query the luminance of item stacks.
+ * which provides the ability to register light sources for items, and to query their luminance.
  *
  * @author LambdAurora
- * @version 3.0.0
+ * @version 4.0.0
  * @since 3.0.0
  */
 public interface ItemLightSourceManager {
@@ -36,7 +37,7 @@ public interface ItemLightSourceManager {
 	 *
 	 * @param stack the item stack
 	 */
-	default int getLuminance(ItemStack stack) {
+	default @Range(from = 0, to = 15) int getLuminance(ItemStack stack) {
 		return this.getLuminance(stack, false);
 	}
 
@@ -46,6 +47,7 @@ public interface ItemLightSourceManager {
 	 * @param stack the item stack
 	 * @param submergedInWater {@code true} if the stack is submerged in water, else {@code false}
 	 */
+	@Range(from = 0, to = 15)
 	int getLuminance(ItemStack stack, boolean submergedInWater);
 
 	/**
@@ -61,6 +63,9 @@ public interface ItemLightSourceManager {
 		void onRegister(RegisterContext context);
 	}
 
+	/**
+	 * Represents the registration context of item light sources.
+	 */
 	interface RegisterContext {
 		/**
 		 * {@return the access to registries}
@@ -77,12 +82,12 @@ public interface ItemLightSourceManager {
 		/**
 		 * Registers a light source of the given item with the given luminance.
 		 *
-		 * @param item the item to light
+		 * @param item the item to light up
 		 * @param luminance the luminance of the item
 		 * @see #register(ItemLightSource)
 		 * @see #register(ItemLike, ItemLuminance)
 		 */
-		default void register(ItemLike item, int luminance) {
+		default void register(ItemLike item, @Range(from = 0, to = 15) int luminance) {
 			this.register(new ItemLightSource(
 					ItemPredicate.Builder.item()
 							.of(this.registryAccess().lookupOrThrow(Registries.ITEM), item)
@@ -94,7 +99,7 @@ public interface ItemLightSourceManager {
 		/**
 		 * Registers a light source of the given item with the given luminance.
 		 *
-		 * @param item the item to light
+		 * @param item the item to light up
 		 * @param luminance the luminance of the item
 		 * @see #register(ItemLightSource)
 		 * @see #register(ItemLike, int)

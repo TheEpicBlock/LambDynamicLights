@@ -10,7 +10,6 @@
 package dev.lambdaurora.lambdynlights.engine;
 
 import dev.lambdaurora.lambdynlights.LambDynLights;
-import dev.lambdaurora.lambdynlights.api.DynamicLightHandlers;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -26,8 +25,8 @@ import org.jetbrains.annotations.NotNull;
  * Represents the behavior of a dynamic light source.
  *
  * @author LambdAurora
- * @version 3.3.0
- * @since 3.3.0
+ * @version 4.0.0
+ * @since 4.0.0
  */
 @ApiStatus.Internal
 public interface DynamicLightSourceBehavior extends DynamicLightSource {
@@ -89,7 +88,7 @@ public interface DynamicLightSourceBehavior extends DynamicLightSource {
 		if (entity.isRemoved()) {
 			lightSource.setDynamicLightEnabled(false);
 		} else {
-			if (DynamicLightHandlers.canLightUp(entity)) {
+			if (DynamicLightingEngine.canLightUp(entity)) {
 				lightSource.dynamicLightTick();
 			} else {
 				lightSource.setLuminance(0);

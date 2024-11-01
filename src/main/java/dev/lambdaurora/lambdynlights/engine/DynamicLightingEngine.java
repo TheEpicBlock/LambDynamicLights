@@ -9,9 +9,13 @@
 
 package dev.lambdaurora.lambdynlights.engine;
 
+import dev.lambdaurora.lambdynlights.LambDynLights;
+import dev.lambdaurora.lambdynlights.accessor.DynamicLightHandlerHolder;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -34,6 +38,25 @@ public final class DynamicLightingEngine {
 
 	private final SpatialLookupEntry[] spatialLookupEntries = new SpatialLookupEntry[MAX_LIGHT_SOURCES];
 	private final int[] startIndices = new int[MAX_LIGHT_SOURCES];
+
+	/**
+	 * Returns whether the given entity can light up or not.
+	 *
+	 * @param entity the entity
+	 * @param <T> the type of the entity
+	 * @return {@code true} if the entity can light up, or {@code false} otherwise
+	 */
+	public static <T extends Entity> boolean canLightUp(T entity) {
+		if (entity == Minecraft.getInstance().player) {
+			if (!LambDynLights.get().config.getSelfLightSource().get())
+				return false;
+		} else if (!LambDynLights.get().config.getEntitiesLightSource().get()) {
+			return false;
+		}
+
+		var setting = DynamicLightHandlerHolder.cast(entity.getType()).lambdynlights$getSetting();
+		return !(setting == null || !setting.get());
+	}
 
 	/**
 	 * Returns the dynamic light level at the specified position.

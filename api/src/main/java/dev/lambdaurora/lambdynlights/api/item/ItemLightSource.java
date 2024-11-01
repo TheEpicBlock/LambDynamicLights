@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Range;
 /**
  * Represents an item light source.
  *
- * @param predicate the predicate to select which items emits the given luminance
+ * @param predicate the predicate to select which items emit the given luminance
  * @param luminance the luminance to emit
  * @param waterSensitive {@code true} if this light source is sensitive to water, or {@code false} otherwise
  * @author LambdAurora
@@ -34,7 +34,7 @@ public record ItemLightSource(ItemPredicate predicate, ItemLuminance luminance, 
 			).apply(instance, ItemLightSource::new)
 	);
 
-	public ItemLightSource(ItemPredicate predicate, int luminance) {
+	public ItemLightSource(ItemPredicate predicate, @Range(from = 0, to = 15) int luminance) {
 		this(predicate, new ItemLuminance.Value(luminance));
 	}
 

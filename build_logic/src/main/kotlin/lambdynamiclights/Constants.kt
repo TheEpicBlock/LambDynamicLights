@@ -6,7 +6,7 @@ object Constants {
 	const val GROUP = "dev.lambdaurora"
 	const val NAME = "lambdynamiclights"
 	const val PRETTY_NAME = "LambDynamicLights"
-	const val VERSION = "3.3.0"
+	const val VERSION = "4.0.0-beta.1"
 	const val JAVA_VERSION = 21
 
 	private var minecraftVersion: String? = null

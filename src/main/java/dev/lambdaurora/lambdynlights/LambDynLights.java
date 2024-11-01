@@ -10,11 +10,11 @@
 package dev.lambdaurora.lambdynlights;
 
 import dev.lambdaurora.lambdynlights.accessor.WorldRendererAccessor;
-import dev.lambdaurora.lambdynlights.api.DynamicLightHandlers;
 import dev.lambdaurora.lambdynlights.api.DynamicLightsInitializer;
 import dev.lambdaurora.lambdynlights.engine.DynamicLightSource;
 import dev.lambdaurora.lambdynlights.engine.DynamicLightSourceBehavior;
 import dev.lambdaurora.lambdynlights.engine.DynamicLightingEngine;
+import dev.lambdaurora.lambdynlights.resource.entity.EntityLightSources;
 import dev.lambdaurora.lambdynlights.resource.item.ItemLightSources;
 import dev.yumi.commons.event.EventManager;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
@@ -56,15 +56,16 @@ import java.util.function.Predicate;
  * Represents the LambDynamicLights mod.
  *
  * @author LambdAurora
- * @version 3.3.0
+ * @version 4.0.0
  * @since 1.0.0
  */
 public class LambDynLights implements ClientModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger("LambDynamicLights");
-	public static final EventManager<Identifier> EVENT_MANAGER = new EventManager<>(Identifier.of(LambDynLightsConstants.NAMESPACE, "default"), Identifier::parse);
+	public static final EventManager<Identifier> EVENT_MANAGER = new EventManager<>(LambDynLightsConstants.id("default"), Identifier::parse);
 	private static LambDynLights INSTANCE;
 	public final DynamicLightsConfig config = new DynamicLightsConfig(this);
 	public final ItemLightSources itemLightSources = new ItemLightSources();
+	public final EntityLightSources entityLightSources = new EntityLightSources();
 	public final DynamicLightingEngine engine = new DynamicLightingEngine();
 	private final Set<DynamicLightSourceBehavior> dynamicLightSources = new HashSet<>();
 	private final List<DynamicLightSourceBehavior> toClear = new ArrayList<>();
@@ -85,9 +86,11 @@ public class LambDynLights implements ClientModInitializer {
 				.forEach(initializer -> initializer.onInitializeDynamicLights(this.itemLightSources));
 
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(this.itemLightSources);
+		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(this.entityLightSources);
 
 		CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> {
 			this.itemLightSources.apply(registries);
+			this.entityLightSources.apply(registries);
 		});
 
 		ClientTickEvents.END_WORLD_TICK.register(level -> {
@@ -102,8 +105,6 @@ public class LambDynLights implements ClientModInitializer {
 			Profiler.get().swap("dynamic_lighting");
 			this.updateAll(context.worldRenderer());
 		});
-
-		DynamicLightHandlers.registerDefaultHandlers();
 	}
 
 	/**
@@ -424,6 +425,25 @@ public class LambDynLights implements ClientModInitializer {
 	 */
 	public static int getLuminanceFromItemStack(@NotNull ItemStack stack, boolean submergedInWater) {
 		return INSTANCE.itemLightSources.getLuminance(stack, submergedInWater);
+	}
+
+	/**
+	 * Returns the luminance from an entity.
+	 *
+	 * @param entity the entity
+	 * @param <T> the type of the entity
+	 * @return the luminance
+	 */
+	public static <T extends Entity> int getLuminanceFrom(T entity) {
+		if (!INSTANCE.config.getEntitiesLightSource().get())
+			return 0;
+		if (entity == Minecraft.getInstance().player && !INSTANCE.config.getSelfLightSource().get())
+			return 0;
+
+		if (!DynamicLightingEngine.canLightUp(entity))
+			return 0;
+
+		return INSTANCE.entityLightSources.getLuminance(entity);
 	}
 
 	/**

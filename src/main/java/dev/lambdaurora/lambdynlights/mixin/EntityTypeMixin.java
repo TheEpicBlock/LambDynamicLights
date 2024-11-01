@@ -11,14 +11,12 @@ package dev.lambdaurora.lambdynlights.mixin;
 
 import dev.lambdaurora.lambdynlights.LambDynLights;
 import dev.lambdaurora.lambdynlights.accessor.DynamicLightHandlerHolder;
-import dev.lambdaurora.lambdynlights.api.DynamicLightHandler;
 import dev.lambdaurora.lambdynlights.config.LightSourceSettingEntry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Text;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -32,19 +30,7 @@ public abstract class EntityTypeMixin<T extends Entity> implements DynamicLightH
 	public abstract String getDescriptionId();
 
 	@Unique
-	private DynamicLightHandler<T> lambdynlights$lightHandler;
-	@Unique
 	private LightSourceSettingEntry lambdynlights$setting;
-
-	@Override
-	public @Nullable DynamicLightHandler<T> lambdynlights$getDynamicLightHandler() {
-		return this.lambdynlights$lightHandler;
-	}
-
-	@Override
-	public void lambdynlights$setDynamicLightHandler(DynamicLightHandler<T> handler) {
-		this.lambdynlights$lightHandler = handler;
-	}
 
 	@Override
 	public LightSourceSettingEntry lambdynlights$getSetting() {

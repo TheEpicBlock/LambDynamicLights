@@ -24,7 +24,7 @@ import java.util.function.Function;
  *
  * @param <T> The type of the light source.
  * @author LambdAurora
- * @version 3.3.0
+ * @version 4.0.0
  * @since 1.1.0
  */
 public interface DynamicLightHandler<T> {
@@ -126,7 +126,7 @@ public interface DynamicLightHandler<T> {
 	 *
 	 * @param handler the base handler of the display entity
 	 * @param <T> the display entity type
-	 * @since 3.3.0
+	 * @since 4.0.0
 	 */
 	static <T extends Display> @NotNull DynamicLightHandler<T> makeDisplayEntityHandler(@NotNull DynamicLightHandler<T> handler) {
 		return new DynamicLightHandler<>() {

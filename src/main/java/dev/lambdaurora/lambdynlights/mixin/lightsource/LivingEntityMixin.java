@@ -10,7 +10,6 @@
 package dev.lambdaurora.lambdynlights.mixin.lightsource;
 
 import dev.lambdaurora.lambdynlights.LambDynLights;
-import dev.lambdaurora.lambdynlights.api.DynamicLightHandlers;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,7 +24,7 @@ public abstract class LivingEntityMixin extends EntityMixin {
 			this.lambdynlights$luminance = LambDynLights.getLivingEntityLuminanceFromItems((LivingEntity) (Object) this);
 		}
 
-		int luminance = DynamicLightHandlers.getLuminanceFrom((Entity) (Object) this);
+		int luminance = LambDynLights.getLuminanceFrom((Entity) (Object) this);
 		if (luminance > this.lambdynlights$luminance)
 			this.lambdynlights$luminance = luminance;
 	}

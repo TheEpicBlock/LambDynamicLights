@@ -16,7 +16,7 @@ import net.minecraft.world.level.Level;
  * Represents a dynamic light source.
  *
  * @author LambdAurora
- * @version 3.3.0
+ * @version 4.0.0
  * @since 1.0.0
  */
 public interface DynamicLightSource {

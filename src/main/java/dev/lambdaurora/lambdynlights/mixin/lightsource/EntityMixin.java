@@ -10,7 +10,6 @@
 package dev.lambdaurora.lambdynlights.mixin.lightsource;
 
 import dev.lambdaurora.lambdynlights.LambDynLights;
-import dev.lambdaurora.lambdynlights.api.DynamicLightHandlers;
 import dev.lambdaurora.lambdynlights.engine.DynamicLightSourceBehavior;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.world.entity.Entity;
@@ -133,7 +132,7 @@ public abstract class EntityMixin implements DynamicLightSourceBehavior {
 	public void dynamicLightTick() {
 		this.lambdynlights$luminance = this.isOnFire() ? 15 : 0;
 
-		int luminance = DynamicLightHandlers.getLuminanceFrom((Entity) (Object) this);
+		int luminance = LambDynLights.getLuminanceFrom((Entity) (Object) this);
 		if (luminance > this.lambdynlights$luminance)
 			this.lambdynlights$luminance = luminance;
 	}
