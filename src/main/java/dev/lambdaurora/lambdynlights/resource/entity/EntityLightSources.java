@@ -16,15 +16,20 @@ import dev.lambdaurora.lambdynlights.LambDynLightsConstants;
 import dev.lambdaurora.lambdynlights.api.entity.EntityLightSource;
 import dev.lambdaurora.lambdynlights.api.entity.EntityLightSourceManager;
 import dev.lambdaurora.lambdynlights.api.entity.luminance.EntityLuminance;
+import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
 import dev.lambdaurora.lambdynlights.resource.LightSourceLoader;
 import dev.lambdaurora.lambdynlights.resource.LoadedLightSourceResource;
 import dev.lambdaurora.lambdynlights.resource.entity.luminance.*;
+import dev.lambdaurora.lambdynlights.resource.item.ItemLightSources;
 import dev.yumi.commons.event.Event;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Represents an entity light source manager.
@@ -36,6 +41,7 @@ import org.slf4j.LoggerFactory;
 public final class EntityLightSources extends LightSourceLoader<EntityLightSource> implements EntityLightSourceManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger("LambDynamicLights|EntityLightSources");
 	private static final Identifier RESOURCE_RELOADER_ID = LambDynLightsConstants.id("entity_dynamic_lights");
+	private static final List<Identifier> RESOURCE_RELOADER_DEPENDENCIES = List.of(ItemLightSources.RESOURCE_RELOADER_ID);
 
 	public static final EntityLuminance.Type WATER_SENSITIVE = EntityLuminance.Type.register(
 			LambDynLightsConstants.id("water_sensitive"), WaterSensititiveEntityLuminance.CODEC
@@ -45,12 +51,6 @@ public final class EntityLightSources extends LightSourceLoader<EntityLightSourc
 	);
 	public static final EntityLuminance.Type CREEPER = EntityLuminance.Type.registerSimple(
 			LambDynLightsConstants.id("creeper"), CreeperLuminance.INSTANCE
-	);
-	public static final EntityLuminance.Type ITEM = EntityLuminance.Type.registerSimple(
-			LambDynLightsConstants.id("item"), ItemEntityLuminance.INSTANCE
-	);
-	public static final EntityLuminance.Type ITEM_FRAME = EntityLuminance.Type.registerSimple(
-			LambDynLightsConstants.id("item_frame"), ItemFrameLuminance.INSTANCE
 	);
 	public static final EntityLuminance.Type MAGMA_CUBE = EntityLuminance.Type.registerSimple(
 			LambDynLightsConstants.id("magma_cube"), MagmaCubeLuminance.INSTANCE
@@ -67,6 +67,11 @@ public final class EntityLightSources extends LightSourceLoader<EntityLightSourc
 	);
 
 	private final Event<Identifier, OnRegister> onRegisterEvent = LambDynLights.EVENT_MANAGER.create(OnRegister.class);
+	private final ItemLightSourceManager itemLightSourceManager;
+
+	public EntityLightSources(ItemLightSourceManager itemLightSourceManager) {
+		this.itemLightSourceManager = itemLightSourceManager;
+	}
 
 	@Override
 	protected Logger getLogger() {
@@ -76,6 +81,11 @@ public final class EntityLightSources extends LightSourceLoader<EntityLightSourc
 	@Override
 	public Identifier getFabricId() {
 		return RESOURCE_RELOADER_ID;
+	}
+
+	@Override
+	public Collection<Identifier> getFabricDependencies() {
+		return RESOURCE_RELOADER_DEPENDENCIES;
 	}
 
 	@Override
@@ -125,8 +135,11 @@ public final class EntityLightSources extends LightSourceLoader<EntityLightSourc
 		int luminance = 0;
 
 		for (var data : this.lightSources) {
-			if (data.predicate().test(entity)) {
-				luminance = Math.max(luminance, data.getLuminance(entity));
+			if (luminance == 15) {
+				// We already achieved the maximum light value, no need to execute the other luminance providers.
+				break;
+			} else if (data.predicate().test(entity)) {
+				luminance = Math.max(luminance, data.getLuminance(this.itemLightSourceManager, entity));
 			}
 		}
 

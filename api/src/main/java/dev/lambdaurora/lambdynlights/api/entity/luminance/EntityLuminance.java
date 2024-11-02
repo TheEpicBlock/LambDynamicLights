@@ -13,6 +13,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Brightness;
@@ -48,24 +49,30 @@ public interface EntityLuminance {
 	/**
 	 * Gets the luminance of the given entity.
 	 *
+	 * @param itemLightSourceManager the item light source manager
 	 * @param entity the entity to get the luminance of
 	 * @return the luminance of the given entity
 	 */
 	@Range(from = 0, to = 15)
-	int getLuminance(Entity entity);
+	int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity);
 
 	/**
 	 * Gets the luminance of the given entity out of the given list of entity luminance source.
 	 *
+	 * @param itemLightSourceManager the item light source manager
 	 * @param entity the entity to get the luminance of
 	 * @param luminances the entity luminance sources
 	 * @return the luminance of the given entity
 	 */
-	static @Range(from = 0, to = 15) int getLuminance(Entity entity, List<EntityLuminance> luminances) {
+	static @Range(from = 0, to = 15) int getLuminance(
+			ItemLightSourceManager itemLightSourceManager,
+			Entity entity,
+			List<EntityLuminance> luminances
+	) {
 		int luminance = 0;
 
 		for (var luminanceSource : luminances) {
-			int value = luminanceSource.getLuminance(entity);
+			int value = luminanceSource.getLuminance(itemLightSourceManager, entity);
 
 			if (value > luminance) {
 				luminance = value;
@@ -94,11 +101,17 @@ public interface EntityLuminance {
 		}
 
 		@Override
-		public @Range(from = 0, to = 15) int getLuminance(Entity entity) {
+		public @Range(from = 0, to = 15) int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
 			return this.luminance;
 		}
 	}
 
+	/**
+	 * Represents a type of entity luminance provider.
+	 *
+	 * @param id the identifier of this type
+	 * @param codec the codec of this type
+	 */
 	record Type(Identifier id, MapCodec<? extends EntityLuminance> codec) {
 		private static final Map<Identifier, Type> TYPES = new Object2ObjectOpenHashMap<>();
 		public static final Codec<Type> CODEC = Identifier.CODEC.flatXmap(
@@ -109,11 +122,17 @@ public interface EntityLuminance {
 		);
 
 		public static final Type VALUE = register("value", Value.CODEC);
+		public static final Type ARROW_ITEM_DERIVED = registerSimple(
+				"arrow/derived_from_self_item", ArrowItemDerivedLuminance.INSTANCE
+		);
 		public static final Type ENDERMAN = registerSimple("enderman", EndermanLuminance.INSTANCE);
 		public static final Type FALLING_BLOCK = registerSimple("falling_block", FallingBlockLuminance.INSTANCE);
 		public static final Type GLOW_SQUID = registerSimple("glow_squid", GlowSquidLuminance.INSTANCE);
+		public static final Type ITEM = register("item", ItemDerivedEntityLuminance.CODEC);
+		public static final Type ITEM_ENTITY = registerSimple("item_entity", ItemEntityLuminance.INSTANCE);
+		public static final Type ITEM_FRAME = registerSimple("item_frame", ItemFrameLuminance.INSTANCE);
 		public static final Type MINECART_DISPLAY_BLOCK = registerSimple(
-				"minecart_display_block", MinecartDisplayBlockLuminance.INSTANCE
+				"minecart/display_block", MinecartDisplayBlockLuminance.INSTANCE
 		);
 
 		public static Type register(Identifier id, MapCodec<? extends EntityLuminance> codec) {

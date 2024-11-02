@@ -13,6 +13,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.lambdaurora.lambdynlights.LambDynLights;
 import dev.lambdaurora.lambdynlights.api.entity.luminance.EntityLuminance;
+import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
 import dev.lambdaurora.lambdynlights.resource.entity.EntityLightSources;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Range;
@@ -49,14 +50,14 @@ public record WaterSensititiveEntityLuminance(
 	}
 
 	@Override
-	public @Range(from = 0, to = 15) int getLuminance(Entity entity) {
+	public @Range(from = 0, to = 15) int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
 		boolean submergedInWater = entity.isSubmergedInWater();
 		boolean shouldCareAboutWater = LambDynLights.get().config.getWaterSensitiveCheck().get();
 
 		if (submergedInWater && (shouldCareAboutWater || this.outOfWater.isEmpty())) {
-			return EntityLuminance.getLuminance(entity, this.inWater);
+			return EntityLuminance.getLuminance(itemLightSourceManager, entity, this.inWater);
 		} else {
-			return EntityLuminance.getLuminance(entity, this.outOfWater);
+			return EntityLuminance.getLuminance(itemLightSourceManager, entity, this.outOfWater);
 		}
 	}
 }

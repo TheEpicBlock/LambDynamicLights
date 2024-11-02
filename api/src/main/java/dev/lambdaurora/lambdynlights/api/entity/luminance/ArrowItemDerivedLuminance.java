@@ -11,30 +11,30 @@ package dev.lambdaurora.lambdynlights.api.entity.luminance;
 
 import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import org.jetbrains.annotations.Range;
 
 /**
- * Represents the luminance value of an enderman.
+ * Represents the luminance value derived from the item of an arrow projectile.
  *
  * @author LambdAurora
  * @version 4.0.0
  * @since 4.0.0
  */
-public final class EndermanLuminance implements EntityLuminance {
-	public static final EndermanLuminance INSTANCE = new EndermanLuminance();
+public final class ArrowItemDerivedLuminance implements EntityLuminance {
+	public static final ArrowItemDerivedLuminance INSTANCE = new ArrowItemDerivedLuminance();
 
-	private EndermanLuminance() {}
+	private ArrowItemDerivedLuminance() {}
 
 	@Override
 	public Type type() {
-		return Type.ENDERMAN;
+		return Type.ARROW_ITEM_DERIVED;
 	}
 
 	@Override
 	public @Range(from = 0, to = 15) int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
-		if (entity instanceof EnderMan enderman && enderman.getCarriedBlock() != null) {
-			return enderman.getCarriedBlock().getLightEmission();
+		if (entity instanceof AbstractArrow arrow) {
+			return itemLightSourceManager.getLuminance(arrow.getPickupItemStackOrigin(), entity.isSubmergedInWater());
 		}
 
 		return 0;

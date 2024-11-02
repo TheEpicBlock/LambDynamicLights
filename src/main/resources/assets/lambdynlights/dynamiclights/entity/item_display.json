@@ -1,6 +1,6 @@
 {
 	"match": {
-		"type": "minecraft:block_display"
+		"type": "minecraft:item_display"
 	},
 	"luminance": {
 		"type": "lambdynlights:display",

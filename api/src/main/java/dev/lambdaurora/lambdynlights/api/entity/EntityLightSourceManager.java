@@ -90,6 +90,7 @@ public interface EntityLightSourceManager {
 							Optional.empty(),
 							Optional.empty(),
 							Optional.empty(),
+							Optional.empty(),
 							Optional.empty()
 					),
 					List.of(new EntityLuminance.Value(luminance))
@@ -108,6 +109,7 @@ public interface EntityLightSourceManager {
 			this.register(new EntityLightSource(
 					new EntityLightSource.EntityPredicate(
 							Optional.of(EntityTypePredicate.of(this.registryAccess().lookupOrThrow(Registries.ENTITY_TYPE), entityType)),
+							Optional.empty(),
 							Optional.empty(),
 							Optional.empty(),
 							Optional.empty(),

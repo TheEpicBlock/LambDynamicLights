@@ -65,7 +65,7 @@ public class LambDynLights implements ClientModInitializer {
 	private static LambDynLights INSTANCE;
 	public final DynamicLightsConfig config = new DynamicLightsConfig(this);
 	public final ItemLightSources itemLightSources = new ItemLightSources();
-	public final EntityLightSources entityLightSources = new EntityLightSources();
+	public final EntityLightSources entityLightSources = new EntityLightSources(this.itemLightSources);
 	public final DynamicLightingEngine engine = new DynamicLightingEngine();
 	private final Set<DynamicLightSourceBehavior> dynamicLightSources = new HashSet<>();
 	private final List<DynamicLightSourceBehavior> toClear = new ArrayList<>();
@@ -83,7 +83,7 @@ public class LambDynLights implements ClientModInitializer {
 		FabricLoader.getInstance().getEntrypointContainers("dynamiclights", DynamicLightsInitializer.class)
 				.stream()
 				.map(EntrypointContainer::getEntrypoint)
-				.forEach(initializer -> initializer.onInitializeDynamicLights(this.itemLightSources));
+				.forEach(initializer -> initializer.onInitializeDynamicLights(this.itemLightSources, this.entityLightSources));
 
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(this.itemLightSources);
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(this.entityLightSources);

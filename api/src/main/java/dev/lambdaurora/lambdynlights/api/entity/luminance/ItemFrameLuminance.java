@@ -7,11 +7,9 @@
  * see the LICENSE file.
  */
 
-package dev.lambdaurora.lambdynlights.resource.entity.luminance;
+package dev.lambdaurora.lambdynlights.api.entity.luminance;
 
-import dev.lambdaurora.lambdynlights.LambDynLights;
-import dev.lambdaurora.lambdynlights.api.entity.luminance.EntityLuminance;
-import dev.lambdaurora.lambdynlights.resource.entity.EntityLightSources;
+import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import org.jetbrains.annotations.Range;
@@ -30,14 +28,14 @@ public final class ItemFrameLuminance implements EntityLuminance {
 
 	@Override
 	public Type type() {
-		return EntityLightSources.ITEM_FRAME;
+		return Type.ITEM_FRAME;
 	}
 
 	@Override
-	public @Range(from = 0, to = 15) int getLuminance(Entity entity) {
+	public @Range(from = 0, to = 15) int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
 		if (entity instanceof ItemFrame itemFrame) {
 			var world = entity.level();
-			return LambDynLights.getLuminanceFromItemStack(itemFrame.getItem(), !world.getFluidState(entity.getBlockPos()).isEmpty());
+			return itemLightSourceManager.getLuminance(itemFrame.getItem(), !world.getFluidState(entity.getBlockPos()).isEmpty());
 		}
 
 		return 0;

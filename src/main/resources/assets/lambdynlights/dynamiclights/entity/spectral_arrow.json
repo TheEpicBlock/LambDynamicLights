@@ -2,5 +2,7 @@
 	"match": {
 		"type": "minecraft:spectral_arrow"
 	},
-	"luminance": 8
+	"luminance": {
+		"type": "lambdynlights:arrow/derived_from_self_item"
+	}
 }

@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class ItemLightSources extends LightSourceLoader<ItemLightSource> implements ItemLightSourceManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger("LambDynamicLights|ItemLightSources");
-	private static final Identifier RESOURCE_RELOADER_ID = LambDynLightsConstants.id("item_dynamic_lights");
+	public static final Identifier RESOURCE_RELOADER_ID = LambDynLightsConstants.id("item_dynamic_lights");
 
 	private final Event<Identifier, OnRegister> onRegisterEvent = LambDynLights.EVENT_MANAGER.create(OnRegister.class);
 

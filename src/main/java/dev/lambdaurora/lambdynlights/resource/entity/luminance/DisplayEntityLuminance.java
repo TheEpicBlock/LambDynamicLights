@@ -11,8 +11,8 @@ package dev.lambdaurora.lambdynlights.resource.entity.luminance;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.lambdaurora.lambdynlights.LambDynLights;
 import dev.lambdaurora.lambdynlights.api.entity.luminance.EntityLuminance;
+import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
 import dev.lambdaurora.lambdynlights.resource.entity.EntityLightSources;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
@@ -42,9 +42,9 @@ public record DisplayEntityLuminance(List<EntityLuminance> luminance) implements
 	}
 
 	@Override
-	public @Range(from = 0, to = 15) int getLuminance(Entity entity) {
+	public @Range(from = 0, to = 15) int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
 		if (entity instanceof Display display && display.getPackedBrightnessOverride() == -1) {
-			return EntityLuminance.getLuminance(entity, this.luminance);
+			return EntityLuminance.getLuminance(itemLightSourceManager, entity, this.luminance);
 		}
 
 		return 0;
@@ -64,7 +64,7 @@ public record DisplayEntityLuminance(List<EntityLuminance> luminance) implements
 		}
 
 		@Override
-		public @Range(from = 0, to = 15) int getLuminance(Entity entity) {
+		public @Range(from = 0, to = 15) int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
 			if (entity instanceof Display.BlockDisplay display)
 				return display.getBlockState().getLightEmission();
 			return 0;
@@ -85,9 +85,9 @@ public record DisplayEntityLuminance(List<EntityLuminance> luminance) implements
 		}
 
 		@Override
-		public @Range(from = 0, to = 15) int getLuminance(Entity entity) {
+		public @Range(from = 0, to = 15) int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
 			if (entity instanceof Display.ItemDisplay display)
-				return LambDynLights.getLuminanceFromItemStack(display.getItemStack(), display.isSubmergedInWater());
+				return itemLightSourceManager.getLuminance(display.getItemStack(), display.isSubmergedInWater());
 			return 0;
 		}
 	}

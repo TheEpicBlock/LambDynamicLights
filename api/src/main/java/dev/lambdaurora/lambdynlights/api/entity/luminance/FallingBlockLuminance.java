@@ -9,6 +9,7 @@
 
 package dev.lambdaurora.lambdynlights.api.entity.luminance;
 
+import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import org.jetbrains.annotations.Range;
@@ -31,7 +32,7 @@ public final class FallingBlockLuminance implements EntityLuminance {
 	}
 
 	@Override
-	public @Range(from = 0, to = 15) int getLuminance(Entity entity) {
+	public @Range(from = 0, to = 15) int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
 		if (entity instanceof FallingBlockEntity fallingBlock) {
 			return fallingBlock.getBlockState().getLightEmission();
 		}

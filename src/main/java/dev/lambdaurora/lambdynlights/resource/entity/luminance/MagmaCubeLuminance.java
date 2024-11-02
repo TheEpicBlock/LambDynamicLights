@@ -10,6 +10,7 @@
 package dev.lambdaurora.lambdynlights.resource.entity.luminance;
 
 import dev.lambdaurora.lambdynlights.api.entity.luminance.EntityLuminance;
+import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
 import dev.lambdaurora.lambdynlights.resource.entity.EntityLightSources;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.MagmaCube;
@@ -33,7 +34,7 @@ public final class MagmaCubeLuminance implements EntityLuminance {
 	}
 
 	@Override
-	public @Range(from = 0, to = 15) int getLuminance(Entity entity) {
+	public @Range(from = 0, to = 15) int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
 		if (entity instanceof MagmaCube magmaCube) {
 			return (magmaCube.squish > 0.6) ? 11 : 8;
 		}

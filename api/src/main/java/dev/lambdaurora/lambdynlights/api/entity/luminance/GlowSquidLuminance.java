@@ -9,6 +9,7 @@
 
 package dev.lambdaurora.lambdynlights.api.entity.luminance;
 
+import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.GlowSquid;
@@ -32,7 +33,7 @@ public final class GlowSquidLuminance implements EntityLuminance {
 	}
 
 	@Override
-	public @Range(from = 0, to = 15) int getLuminance(Entity entity) {
+	public @Range(from = 0, to = 15) int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
 		if (entity instanceof GlowSquid glowSquid) {
 			return (int) MathHelper.clampedLerp(0.f, 12.f, 1.f - glowSquid.getDarkTicksRemaining() / 10.f);
 		}
