@@ -26,10 +26,11 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin implements Dyn
 
 	@Override
 	public void dynamicLightTick() {
-		super.dynamicLightTick();
-
-		if (this.isSpectator())
+		if (this.isSpectator()) {
 			this.lambdynlights$luminance = 0;
+		} else {
+			super.dynamicLightTick();
+		}
 
 		if (this.lambdynlights$lastWorld != this.level()) {
 			this.lambdynlights$lastWorld = this.level();

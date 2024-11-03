@@ -18,6 +18,11 @@ import org.spongepowered.asm.mixin.Mixin;
 public abstract class LivingEntityMixin extends EntityMixin {
 	@Override
 	public void dynamicLightTick() {
+		if (this.isInvisible()) {
+			this.lambdynlights$luminance = 0;
+			return;
+		}
+
 		if (this.isOnFire() || this.isCurrentlyGlowing()) {
 			this.lambdynlights$luminance = 15;
 		} else {
