@@ -18,6 +18,7 @@ nightconfig = "3.8.1"
 gradle-licenser = "2.0.+"
 gradle-loom = "1.8.+"
 mappingio = "0.6.1"
+gson = "2.11.0"
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
@@ -40,3 +41,4 @@ nightconfig-toml = { module = "com.electronwill.night-config:toml", version.ref 
 gradle-licenser = { module = "dev.yumi:yumi-gradle-licenser", version.ref = "gradle-licenser" }
 gradle-loom = { module = "net.fabricmc:fabric-loom", version.ref = "gradle-loom" }
 mappingio = { module = "net.fabricmc:mapping-io", version.ref = "mappingio" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }

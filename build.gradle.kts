@@ -18,6 +18,19 @@ if (!(System.getenv("CURSEFORGE_TOKEN") != null || System.getenv("MODRINTH_TOKEN
 }
 logger.lifecycle("Preparing version ${version}...")
 
+tasks.generateFmj.configure {
+	this.fmj.get()
+		.withEntrypoints("client", "dev.lambdaurora.lambdynlights.LambDynLights")
+		.withEntrypoints("modmenu", "dev.lambdaurora.lambdynlights.LambDynLightsModMenu")
+		.withAccessWidener("lambdynlights.accesswidener")
+		.withMixins("lambdynlights.mixins.json", "lambdynlights.lightsource.mixins.json")
+		.withDepend("${Constants.NAMESPACE}_api", ">=${version}")
+		.withDepend("fabric-api", ">=${libs.versions.fabric.api.get()}")
+		.withDepend("spruceui", ">=${libs.versions.spruceui.get()}")
+		.withRecommend("modmenu", ">=${libs.versions.modmenu.get()}")
+		.withBreak("optifabric", "*")
+}
+
 repositories {
 	mavenLocal()
 	maven {
@@ -35,8 +48,10 @@ loom {
 }
 
 dependencies {
-	implementation(project(":api", configuration = "namedElements"))
+	api(project(":api", configuration = "namedElements"))
+	include(project(":api"))
 
+	modImplementation(libs.fabric.loader)
 	modImplementation(libs.fabric.api)
 
 	implementation(libs.nightconfig.core)
@@ -50,9 +65,6 @@ dependencies {
 		this.isTransitive = false
 	}
 
-	shadow(project(":api", configuration = "namedElements")) {
-		isTransitive = false
-	}
 	shadow(libs.yumi.commons.core) {
 		isTransitive = false
 	}
@@ -90,7 +102,7 @@ tasks.remapJar {
 
 modrinth {
 	projectId = project.property("modrinth_id") as String
-	versionName = "LambDynamicLights ${Constants.VERSION} (${Constants.mcVersion()})"
+	versionName = "${Constants.PRETTY_NAME} ${Constants.VERSION} (${Constants.mcVersion()})"
 	uploadFile.set(tasks.remapJar.get())
 	loaders.set(listOf("fabric", "quilt"))
 	gameVersions.set(listOf(Constants.mcVersion()))
@@ -146,7 +158,7 @@ tasks.register<TaskPublishCurseForge>("curseforge") {
 	mainFile.addJavaVersion("Java 21", "Java 22")
 	mainFile.addEnvironment("Client")
 
-	mainFile.displayName = "LambDynamicLights ${Constants.VERSION} (${Constants.mcVersion()})"
+	mainFile.displayName = "${Constants.PRETTY_NAME} ${Constants.VERSION} (${Constants.mcVersion()})"
 	mainFile.addRequirement("fabric-api")
 	mainFile.addOptional("modmenu")
 	mainFile.addIncompatibility("optifabric")
@@ -161,12 +173,11 @@ publishing {
 		create<MavenPublication>("mavenJava") {
 			from(components["java"])
 
-			groupId = "$group.lambdynamiclights"
 			artifactId = "lambdynamiclights-runtime"
 
 			pom {
 				name.set(Constants.PRETTY_NAME)
-				description.set("Adds dynamic lighting to Minecraft.")
+				description.set(Constants.DESCRIPTION)
 			}
 		}
 	}

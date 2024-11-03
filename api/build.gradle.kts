@@ -4,7 +4,23 @@ plugins {
 	id("lambdynamiclights")
 }
 
+val prettyName = "${Constants.PRETTY_NAME} (API)"
+
 base.archivesName.set(Constants.NAME + "-api")
+
+tasks.generateFmj.configure {
+	this.fmj.get()
+		.withNamespace(Constants.NAMESPACE + "_api")
+		.withName(prettyName)
+		.withDescription(Constants.API_DESCRIPTION)
+		.withModMenu {
+			it.withBadges("library")
+				.withParent(Constants.NAMESPACE, Constants.PRETTY_NAME) { parent ->
+					parent.withDescription(Constants.DESCRIPTION)
+						.withIcon("assets/${Constants.NAMESPACE}/icon.png")
+				}
+		}
+}
 
 // Configure the maven publication.
 publishing {
@@ -12,12 +28,11 @@ publishing {
 		create<MavenPublication>("mavenJava") {
 			from(components["java"])
 
-			groupId = "$group.lambdynamiclights"
 			artifactId = "lambdynamiclights-api"
 
 			pom {
-				name.set("${Constants.PRETTY_NAME} (API)")
-				description.set("API for LambDynamicLights, a mod which adds dynamic lighting to Minecraft.")
+				name.set(prettyName)
+				description.set(Constants.API_DESCRIPTION)
 			}
 		}
 	}

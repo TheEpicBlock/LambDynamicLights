@@ -1,9 +1,11 @@
 import lambdynamiclights.Constants
+import lambdynamiclights.data.Fmj
 import lambdynamiclights.mappings.MojangMappingsSpec
+import lambdynamiclights.task.GenerateFmjTask
 import org.gradle.accessors.dm.LibrariesForLibs
 
 plugins {
-	id("fabric-loom")
+	id("lambdynamiclights-common")
 	`java-library`
 	`maven-publish`
 	id("dev.yumi.gradle.licenser")
@@ -14,23 +16,48 @@ plugins {
 val libs = the<LibrariesForLibs>()
 Constants.finalizeInit(libs)
 
-group = Constants.GROUP
-version = "${Constants.VERSION}+${Constants.mcVersion()}"
-
-loom {
-	runtimeOnlyLog4j = true
+val generateFmj = tasks.register("generateFmj", GenerateFmjTask::class) {
+	this.fmj.set(
+		Fmj(Constants.NAMESPACE, Constants.PRETTY_NAME, project.version.toString())
+			.withDescription(Constants.DESCRIPTION)
+			.withAuthors(Constants.AUTHORS)
+			.withContact {
+				it.withHomepage(Constants.PROJECT_LINK)
+					.withSources(Constants.SOURCES_LINK)
+					.withIssues("${Constants.SOURCES_LINK}/issues")
+			}
+			.withLicense(Constants.LICENSE)
+			.withIcon("assets/${Constants.NAMESPACE}/icon.png")
+			.withEnvironment("client")
+			.withDepend("fabricloader", ">=${libs.versions.fabric.loader.get()}")
+			.withDepend("minecraft", "~1.21 >=1.21.2-")
+			.withDepend("java", ">=${Constants.JAVA_VERSION}")
+			.withModMenu {
+				it.withLink("modmenu.curseforge", "https://www.curseforge.com/minecraft/mc-mods/lambdynamiclights")
+					.withLink("modmenu.discord", "https://discord.lambdaurora.dev/")
+					.withLink("modmenu.github_releases", "${Constants.SOURCES_LINK}/releases")
+					.withLink("modmenu.modrinth", "https://modrinth.com/mod/lambdynamiclights")
+					.withLink("modmenu.bluesky", "https://bsky.app/profile/lambdaurora.dev")
+					.withLink("modmenu.twitter", "https://twitter.com/LambdAurora")
+			}
+	)
+	outputDir.set(project.file("build/generated/generated_resources/"))
 }
 
-repositories {
-	mavenCentral()
-	maven {
-		name = "Gegy"
-		url = uri("https://maven.gegy.dev")
+tasks.ideaSyncTask.configure {
+	dependsOn(generateFmj)
+}
+
+sourceSets {
+	main {
+		resources {
+			// This is needed so that people can use their IDE to compile the project (bypassing Gradle).
+			srcDir(generateFmj)
+		}
 	}
 }
 
 dependencies {
-	minecraft(libs.minecraft)
 	@Suppress("UnstableApiUsage")
 	mappings(loom.layered {
 		addLayer(MojangMappingsSpec(false))
@@ -38,28 +65,18 @@ dependencies {
 		//parchment("org.parchmentmc.data:parchment-${Constants.getMcVersionString()}:${libs.versions.mappings.parchment.get()}@zip")
 		mappings("dev.lambdaurora:yalmm:${Constants.mcVersion()}+build.${libs.versions.mappings.yalmm.get()}")
 	})
-	modImplementation(libs.fabric.loader)
 
 	api(libs.yumi.commons.event)
-}
-
-java {
-	sourceCompatibility = JavaVersion.toVersion(Constants.JAVA_VERSION)
-	targetCompatibility = JavaVersion.toVersion(Constants.JAVA_VERSION)
-
-	withSourcesJar()
-}
-
-tasks.withType<JavaCompile>().configureEach {
-	options.encoding = "UTF-8"
-
-	options.release.set(Constants.JAVA_VERSION)
 }
 
 tasks.jar {
 	from(rootProject.file("LICENSE")) {
 		rename { "${it}_${Constants.NAME}" }
 	}
+}
+
+tasks.getByName("sourcesJar") {
+	dependsOn(generateFmj)
 }
 
 license {

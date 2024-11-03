@@ -13,7 +13,7 @@ import dev.lambdaurora.lambdynlights.api.entity.EntityLightSourceManager;
 import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
 
 /**
- * Represents the entrypoint for LambDynamicLights API.
+ * Represents the entrypoint for LambDynamicLights' API.
  *
  * @author LambdAurora
  * @version 4.0.0
