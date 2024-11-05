@@ -12,6 +12,7 @@ package dev.lambdaurora.lambdynlights.api.entity.luminance;
 import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 /**
@@ -27,12 +28,12 @@ public final class ItemEntityLuminance implements EntityLuminance {
 	private ItemEntityLuminance() {}
 
 	@Override
-	public Type type() {
+	public @NotNull Type type() {
 		return Type.ITEM_ENTITY;
 	}
 
 	@Override
-	public @Range(from = 0, to = 15) int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
+	public @Range(from = 0, to = 15) int getLuminance(@NotNull ItemLightSourceManager itemLightSourceManager, @NotNull Entity entity) {
 		if (entity instanceof ItemEntity itemEntity) {
 			return itemLightSourceManager.getLuminance(itemEntity.getItem(), entity.isSubmergedInWater());
 		}

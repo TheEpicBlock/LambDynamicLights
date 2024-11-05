@@ -18,6 +18,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Brightness;
 import net.minecraft.world.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.util.List;
@@ -25,17 +26,23 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Represents the luminance value of an entity.
+ * Represents the provider of a luminance value of a given entity.
  *
  * @author LambdAurora
  * @version 4.0.0
  * @since 4.0.0
  */
 public interface EntityLuminance {
+	/**
+	 * Represents the Codec of an entity luminance provider.
+	 */
 	Codec<EntityLuminance> CODEC = Codec.withAlternative(
 			Type.CODEC.dispatch(EntityLuminance::type, Type::codec),
 			Value.DIRECT_CODEC
 	);
+	/**
+	 * Represents the Codec of a list of entity luminance providers.
+	 */
 	Codec<List<EntityLuminance>> LIST_CODEC = Codec.withAlternative(
 			CODEC.listOf(),
 			CODEC.xmap(List::of, List::getFirst)
@@ -44,7 +51,7 @@ public interface EntityLuminance {
 	/**
 	 * {@return the type of this entity luminance}
 	 */
-	Type type();
+	@NotNull Type type();
 
 	/**
 	 * Gets the luminance of the given entity.
@@ -54,7 +61,7 @@ public interface EntityLuminance {
 	 * @return the luminance of the given entity
 	 */
 	@Range(from = 0, to = 15)
-	int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity);
+	int getLuminance(@NotNull ItemLightSourceManager itemLightSourceManager, @NotNull Entity entity);
 
 	/**
 	 * Gets the luminance of the given entity out of the given list of entity luminance source.
@@ -65,9 +72,9 @@ public interface EntityLuminance {
 	 * @return the luminance of the given entity
 	 */
 	static @Range(from = 0, to = 15) int getLuminance(
-			ItemLightSourceManager itemLightSourceManager,
-			Entity entity,
-			List<EntityLuminance> luminances
+			@NotNull ItemLightSourceManager itemLightSourceManager,
+			@NotNull Entity entity,
+			@NotNull List<@NotNull EntityLuminance> luminances
 	) {
 		int luminance = 0;
 
@@ -96,12 +103,12 @@ public interface EntityLuminance {
 		);
 
 		@Override
-		public Type type() {
+		public @NotNull Type type() {
 			return Type.VALUE;
 		}
 
 		@Override
-		public @Range(from = 0, to = 15) int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
+		public @Range(from = 0, to = 15) int getLuminance(@NotNull ItemLightSourceManager itemLightSourceManager, @NotNull Entity entity) {
 			return this.luminance;
 		}
 	}
@@ -114,6 +121,9 @@ public interface EntityLuminance {
 	 */
 	record Type(Identifier id, MapCodec<? extends EntityLuminance> codec) {
 		private static final Map<Identifier, Type> TYPES = new Object2ObjectOpenHashMap<>();
+		/**
+		 * Represents the Codec of an entity luminance provider type.
+		 */
 		public static final Codec<Type> CODEC = Identifier.CODEC.flatXmap(
 				name -> Optional.ofNullable(TYPES.get(name))
 						.map(DataResult::success)
@@ -135,7 +145,7 @@ public interface EntityLuminance {
 				"minecart/display_block", MinecartDisplayBlockLuminance.INSTANCE
 		);
 
-		public static Type register(Identifier id, MapCodec<? extends EntityLuminance> codec) {
+		public static Type register(@NotNull Identifier id, @NotNull MapCodec<? extends EntityLuminance> codec) {
 			var type = new Type(id, codec);
 			TYPES.put(id, type);
 			return type;
@@ -145,7 +155,7 @@ public interface EntityLuminance {
 			return register(Identifier.of("lambdynlights", name), codec);
 		}
 
-		public static Type registerSimple(Identifier id, EntityLuminance singleton) {
+		public static Type registerSimple(@NotNull Identifier id, @NotNull EntityLuminance singleton) {
 			return register(id, MapCodec.unit(singleton));
 		}
 

@@ -18,6 +18,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.Brightness;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public sealed interface ItemLuminance permits ItemLuminance.Value, ItemLuminance
 	/**
 	 * {@return the type of this item luminance}
 	 */
-	Type type();
+	@NotNull Type type();
 
 	/**
 	 * Gets the luminance of the given item stack.
@@ -49,7 +50,7 @@ public sealed interface ItemLuminance permits ItemLuminance.Value, ItemLuminance
 	 * @return the luminance of the given item stack
 	 */
 	@Range(from = 0, to = 15)
-	int getLuminance(ItemStack stack);
+	int getLuminance(@NotNull ItemStack stack);
 
 	/**
 	 * Represents a direct item luminance value.
@@ -65,12 +66,12 @@ public sealed interface ItemLuminance permits ItemLuminance.Value, ItemLuminance
 		);
 
 		@Override
-		public Type type() {
+		public @NotNull Type type() {
 			return Type.VALUE;
 		}
 
 		@Override
-		public @Range(from = 0, to = 15) int getLuminance(ItemStack stack) {
+		public @Range(from = 0, to = 15) int getLuminance(@NotNull ItemStack stack) {
 			return this.luminance;
 		}
 	}
@@ -97,12 +98,12 @@ public sealed interface ItemLuminance permits ItemLuminance.Value, ItemLuminance
 		}
 
 		@Override
-		public Type type() {
+		public @NotNull Type type() {
 			return Type.BLOCK_REFERENCE;
 		}
 
 		@Override
-		public @Range(from = 0, to = 15) int getLuminance(ItemStack stack) {
+		public @Range(from = 0, to = 15) int getLuminance(@NotNull ItemStack stack) {
 			return this.block.defaultState().getLightEmission();
 		}
 	}
@@ -117,12 +118,12 @@ public sealed interface ItemLuminance permits ItemLuminance.Value, ItemLuminance
 		private BlockSelf() {}
 
 		@Override
-		public Type type() {
+		public @NotNull Type type() {
 			return Type.BLOCK_SELF;
 		}
 
 		@Override
-		public @Range(from = 0, to = 15) int getLuminance(ItemStack stack) {
+		public @Range(from = 0, to = 15) int getLuminance(@NotNull ItemStack stack) {
 			return Block.byItem(stack.getItem()).defaultState().getLightEmission();
 		}
 	}

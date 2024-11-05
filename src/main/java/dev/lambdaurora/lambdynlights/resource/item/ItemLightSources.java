@@ -22,6 +22,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,12 +59,12 @@ public final class ItemLightSources extends LightSourceLoader<ItemLightSource> i
 		super.apply(registryAccess);
 		this.onRegisterEvent.invoker().onRegister(new RegisterContext() {
 			@Override
-			public RegistryAccess registryAccess() {
+			public @NotNull RegistryAccess registryAccess() {
 				return registryAccess;
 			}
 
 			@Override
-			public void register(ItemLightSource itemLightSource) {
+			public void register(@NotNull ItemLightSource itemLightSource) {
 				ItemLightSources.this.lightSources.add(itemLightSource);
 			}
 		});
@@ -86,12 +87,12 @@ public final class ItemLightSources extends LightSourceLoader<ItemLightSource> i
 	}
 
 	@Override
-	public Event<Identifier, OnRegister> onRegisterEvent() {
+	public @NotNull Event<Identifier, OnRegister> onRegisterEvent() {
 		return this.onRegisterEvent;
 	}
 
 	@Override
-	public int getLuminance(ItemStack stack, boolean submergedInWater) {
+	public int getLuminance(@NotNull ItemStack stack, boolean submergedInWater) {
 		boolean shouldCareAboutWater = submergedInWater && LambDynLights.get().config.getWaterSensitiveCheck().get();
 
 		int luminance = 0;

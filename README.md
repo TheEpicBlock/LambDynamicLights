@@ -103,7 +103,7 @@ Check [this documentation](https://github.com/LambdAurora/LambDynamicLights/blob
 
 ## 📖 Is there an API? How to use it as a developer?
 
-Check [this documentation](https://github.com/LambdAurora/LambDynamicLights/blob/1.21/API.md).
+Check [this documentation](https://lambdaurora.dev/projects/lambdynamiclights/docs/v4/).
 
 <!-- modrinth_exclude.long_start -->
 ## Downloads

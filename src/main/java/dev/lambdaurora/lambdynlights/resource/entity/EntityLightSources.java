@@ -25,6 +25,7 @@ import dev.yumi.commons.event.Event;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,12 +99,12 @@ public final class EntityLightSources extends LightSourceLoader<EntityLightSourc
 		super.apply(registryAccess);
 		this.onRegisterEvent.invoker().onRegister(new RegisterContext() {
 			@Override
-			public RegistryAccess registryAccess() {
+			public @NotNull RegistryAccess registryAccess() {
 				return registryAccess;
 			}
 
 			@Override
-			public void register(EntityLightSource entityLightSource) {
+			public void register(@NotNull EntityLightSource entityLightSource) {
 				EntityLightSources.this.lightSources.add(entityLightSource);
 			}
 		});
@@ -126,12 +127,12 @@ public final class EntityLightSources extends LightSourceLoader<EntityLightSourc
 	}
 
 	@Override
-	public Event<Identifier, OnRegister> onRegisterEvent() {
+	public @NotNull Event<Identifier, OnRegister> onRegisterEvent() {
 		return this.onRegisterEvent;
 	}
 
 	@Override
-	public int getLuminance(Entity entity) {
+	public int getLuminance(@NotNull Entity entity) {
 		int luminance = 0;
 
 		for (var data : this.lightSources) {

@@ -36,10 +36,10 @@ import net.minecraft.util.profiling.Profiler;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.PrimedTnt;
-import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Async;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -59,6 +59,7 @@ import java.util.function.Predicate;
  * @version 4.0.0
  * @since 1.0.0
  */
+@ApiStatus.Internal
 public class LambDynLights implements ClientModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger("LambDynamicLights");
 	public static final EventManager<Identifier> EVENT_MANAGER = new EventManager<>(LambDynLightsConstants.id("default"), Identifier::parse);
@@ -283,13 +284,6 @@ public class LambDynLights implements ClientModInitializer {
 	}
 
 	/**
-	 * Removes Creeper light sources from tracked light sources.
-	 */
-	public void removeCreeperLightSources() {
-		this.removeLightSources(entity -> entity instanceof Creeper);
-	}
-
-	/**
 	 * Removes TNT light sources from tracked light sources.
 	 */
 	public void removeTntLightSources() {
@@ -344,6 +338,7 @@ public class LambDynLights implements ClientModInitializer {
 	 * @param renderer the renderer
 	 * @param chunkPos the chunk position
 	 */
+	@Async.Schedule
 	public static void scheduleChunkRebuild(@NotNull LevelRenderer renderer, @NotNull BlockPos chunkPos) {
 		scheduleChunkRebuild(renderer, chunkPos.getX(), chunkPos.getY(), chunkPos.getZ());
 	}
@@ -354,10 +349,12 @@ public class LambDynLights implements ClientModInitializer {
 	 * @param renderer the renderer
 	 * @param chunkPos the packed chunk position
 	 */
+	@Async.Schedule
 	public static void scheduleChunkRebuild(@NotNull LevelRenderer renderer, long chunkPos) {
 		scheduleChunkRebuild(renderer, BlockPos.unpackLongX(chunkPos), BlockPos.unpackLongY(chunkPos), BlockPos.unpackLongZ(chunkPos));
 	}
 
+	@Async.Schedule
 	public static void scheduleChunkRebuild(@NotNull LevelRenderer renderer, int x, int y, int z) {
 		if (Minecraft.getInstance().level != null)
 			((WorldRendererAccessor) renderer).lambdynlights$scheduleChunkRebuild(x, y, z, false);
@@ -411,20 +408,10 @@ public class LambDynLights implements ClientModInitializer {
 
 		for (var equipped : entity.getAllSlots()) {
 			if (!equipped.isEmpty())
-				luminance = Math.max(luminance, LambDynLights.getLuminanceFromItemStack(equipped, submergedInFluid));
+				luminance = Math.max(luminance, INSTANCE.itemLightSources.getLuminance(equipped, submergedInFluid));
 		}
 
 		return luminance;
-	}
-
-	/**
-	 * {@return the luminance value of the item stack}
-	 *
-	 * @param stack the item stack
-	 * @param submergedInWater {@code true} if the stack is submerged in water, else {@code false}
-	 */
-	public static int getLuminanceFromItemStack(@NotNull ItemStack stack, boolean submergedInWater) {
-		return INSTANCE.itemLightSources.getLuminance(stack, submergedInWater);
 	}
 
 	/**

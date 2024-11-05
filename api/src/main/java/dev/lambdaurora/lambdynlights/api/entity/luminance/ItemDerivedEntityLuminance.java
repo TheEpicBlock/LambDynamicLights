@@ -16,6 +16,7 @@ import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
 import net.minecraft.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.util.HashMap;
@@ -43,12 +44,12 @@ public record ItemDerivedEntityLuminance(ItemStack item, boolean includeRain, Op
 	);
 
 	@Override
-	public Type type() {
+	public @NotNull Type type() {
 		return Type.ITEM;
 	}
 
 	@Override
-	public @Range(from = 0, to = 15) int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
+	public @Range(from = 0, to = 15) int getLuminance(@NotNull ItemLightSourceManager itemLightSourceManager, @NotNull Entity entity) {
 		boolean wet = this.always.map(value -> switch (value) {
 			case DRY -> false;
 			case WET -> true;

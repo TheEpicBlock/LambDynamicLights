@@ -17,6 +17,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public interface EntityLightSourceManager {
 	/**
 	 * {@return the registration event for entity light sources}
 	 */
-	Event<Identifier, OnRegister> onRegisterEvent();
+	@NotNull Event<Identifier, OnRegister> onRegisterEvent();
 
 	/**
 	 * {@return the luminance value of the entity}
@@ -42,7 +43,7 @@ public interface EntityLightSourceManager {
 	 * @param entity the entity
 	 */
 	@Range(from = 0, to = 15)
-	int getLuminance(Entity entity);
+	int getLuminance(@NotNull Entity entity);
 
 	/**
 	 * Represents the registration event of entity light sources.
@@ -54,7 +55,7 @@ public interface EntityLightSourceManager {
 		 *
 		 * @param context the registration context
 		 */
-		void onRegister(RegisterContext context);
+		void onRegister(@NotNull RegisterContext context);
 	}
 
 	/**
@@ -64,14 +65,14 @@ public interface EntityLightSourceManager {
 		/**
 		 * {@return the access to registries}
 		 */
-		RegistryAccess registryAccess();
+		@NotNull RegistryAccess registryAccess();
 
 		/**
 		 * Registers the given entity light source.
 		 *
 		 * @param entityLightSource the entity light source to register
 		 */
-		void register(EntityLightSource entityLightSource);
+		void register(@NotNull EntityLightSource entityLightSource);
 
 		/**
 		 * Registers a light source of the given entity with the given luminance.
@@ -81,7 +82,7 @@ public interface EntityLightSourceManager {
 		 * @see #register(EntityLightSource)
 		 * @see #register(EntityType, EntityLuminance...)
 		 */
-		default void register(EntityType<?> entityType, int luminance) {
+		default void register(@NotNull EntityType<?> entityType, @Range(from = 0, to = 15) int luminance) {
 			this.register(new EntityLightSource(
 					new EntityLightSource.EntityPredicate(
 							Optional.of(EntityTypePredicate.of(this.registryAccess().lookupOrThrow(Registries.ENTITY_TYPE), entityType)),
@@ -105,7 +106,7 @@ public interface EntityLightSourceManager {
 		 * @see #register(EntityLightSource)
 		 * @see #register(EntityType, int)
 		 */
-		default void register(EntityType<?> entityType, EntityLuminance... luminance) {
+		default void register(@NotNull EntityType<?> entityType, EntityLuminance... luminance) {
 			this.register(new EntityLightSource(
 					new EntityLightSource.EntityPredicate(
 							Optional.of(EntityTypePredicate.of(this.registryAccess().lookupOrThrow(Registries.ENTITY_TYPE), entityType)),

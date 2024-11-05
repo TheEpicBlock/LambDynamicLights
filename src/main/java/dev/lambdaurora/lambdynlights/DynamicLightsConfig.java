@@ -29,7 +29,7 @@ import java.nio.file.Path;
  * Represents the mod configuration.
  *
  * @author LambdAurora
- * @version 3.0.0
+ * @version 4.0.0
  * @since 1.0.0
  */
 public class DynamicLightsConfig {
@@ -193,9 +193,6 @@ public class DynamicLightsConfig {
 	 */
 	public void setCreeperLightingMode(@NotNull ExplosiveLightingMode lightingMode) {
 		this.creeperLightingMode = lightingMode;
-
-		if (!lightingMode.isEnabled())
-			this.mod.removeCreeperLightSources();
 		this.config.set("light_sources.creeper", lightingMode.getName());
 	}
 

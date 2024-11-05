@@ -14,6 +14,7 @@ import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
 import dev.lambdaurora.lambdynlights.resource.entity.EntityLightSources;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.MagmaCube;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 /**
@@ -29,12 +30,12 @@ public final class MagmaCubeLuminance implements EntityLuminance {
 	private MagmaCubeLuminance() {}
 
 	@Override
-	public Type type() {
+	public @NotNull Type type() {
 		return EntityLightSources.MAGMA_CUBE;
 	}
 
 	@Override
-	public @Range(from = 0, to = 15) int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
+	public @Range(from = 0, to = 15) int getLuminance(@NotNull ItemLightSourceManager itemLightSourceManager, @NotNull Entity entity) {
 		if (entity instanceof MagmaCube magmaCube) {
 			return (magmaCube.squish > 0.6) ? 11 : 8;
 		}
