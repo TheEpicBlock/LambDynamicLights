@@ -39,7 +39,6 @@ import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockAndTintGetter;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Async;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -338,7 +337,6 @@ public class LambDynLights implements ClientModInitializer {
 	 * @param renderer the renderer
 	 * @param chunkPos the chunk position
 	 */
-	@Async.Schedule
 	public static void scheduleChunkRebuild(@NotNull LevelRenderer renderer, @NotNull BlockPos chunkPos) {
 		scheduleChunkRebuild(renderer, chunkPos.getX(), chunkPos.getY(), chunkPos.getZ());
 	}
@@ -349,12 +347,10 @@ public class LambDynLights implements ClientModInitializer {
 	 * @param renderer the renderer
 	 * @param chunkPos the packed chunk position
 	 */
-	@Async.Schedule
 	public static void scheduleChunkRebuild(@NotNull LevelRenderer renderer, long chunkPos) {
 		scheduleChunkRebuild(renderer, BlockPos.unpackLongX(chunkPos), BlockPos.unpackLongY(chunkPos), BlockPos.unpackLongZ(chunkPos));
 	}
 
-	@Async.Schedule
 	public static void scheduleChunkRebuild(@NotNull LevelRenderer renderer, int x, int y, int z) {
 		if (Minecraft.getInstance().level != null)
 			((WorldRendererAccessor) renderer).lambdynlights$scheduleChunkRebuild(x, y, z, false);

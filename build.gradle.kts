@@ -60,6 +60,7 @@ dependencies {
 
 	modImplementation(libs.fabric.loader)
 	fabricApiModules.forEach { modImplementation(it) }
+	modRuntimeOnly(fabricApi.module("fabric-renderer-indigo", libs.versions.fabric.api.get()))
 
 	implementation(libs.nightconfig.core)
 	implementation(libs.nightconfig.toml)
