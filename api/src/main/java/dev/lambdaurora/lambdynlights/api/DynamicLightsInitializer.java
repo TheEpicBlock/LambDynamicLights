@@ -21,6 +21,13 @@ import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
  */
 public interface DynamicLightsInitializer {
 	/**
+	 * The entrypoint key for LambDynamicLights' API, whose value is {@value}.
+	 *
+	 * @since 4.0.0
+	 */
+	String ENTRYPOINT_KEY = "lambdynlights:initializer";
+
+	/**
 	 * Called when LambDynamicLights is initialized to register custom dynamic light handlers and item light sources.
 	 *
 	 * @param itemLightSourceManager the manager for item light sources

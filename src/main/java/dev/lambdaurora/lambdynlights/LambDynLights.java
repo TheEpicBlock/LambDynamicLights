@@ -24,7 +24,11 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.LanguageAdapter;
+import net.fabricmc.loader.api.LanguageAdapterException;
+import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.fabricmc.loader.api.metadata.CustomValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -80,11 +84,6 @@ public class LambDynLights implements ClientModInitializer {
 
 		this.config.load();
 
-		FabricLoader.getInstance().getEntrypointContainers("dynamiclights", DynamicLightsInitializer.class)
-				.stream()
-				.map(EntrypointContainer::getEntrypoint)
-				.forEach(initializer -> initializer.onInitializeDynamicLights(this.itemLightSources, this.entityLightSources));
-
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(this.itemLightSources);
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(this.entityLightSources);
 
@@ -105,6 +104,58 @@ public class LambDynLights implements ClientModInitializer {
 			Profiler.get().swap("dynamic_lighting");
 			this.updateAll(context.worldRenderer());
 		});
+
+		this.initializeApi();
+	}
+
+	/**
+	 * Initializes the API.
+	 */
+	private void initializeApi() {
+		this.invokeInitializers(DynamicLightsInitializer.ENTRYPOINT_KEY);
+		// Legacy
+		this.invokeInitializers("dynamiclights");
+
+		// Sinytra
+		// Under NeoForge there is no simple entrypoint system, so we end up just re-implementing Fabric-style entrypoints.
+		// @TODO: This might need tweaking depending on how it gets implemented on Sinytra's side.
+		FabricLoader.getInstance().getAllMods().stream()
+				.filter(mod -> mod.getMetadata().containsCustomValue(DynamicLightsInitializer.ENTRYPOINT_KEY))
+				.forEach(this::invokeInitializer);
+	}
+
+	/**
+	 * Invokes {@linkplain DynamicLightsInitializer dynamic lights initializers} using Fabric's entrypoint system.
+	 *
+	 * @param entrypointKey the key of the entrypoints to invoke
+	 */
+	private void invokeInitializers(String entrypointKey) {
+		FabricLoader.getInstance().getEntrypointContainers(entrypointKey, DynamicLightsInitializer.class)
+				.stream()
+				.map(EntrypointContainer::getEntrypoint)
+				.forEach(this::invokeInitializer);
+	}
+
+	private void invokeInitializer(ModContainer mod) {
+		String id = mod.getMetadata().getId();
+		var entrypointValue = mod.getMetadata().getCustomValue(DynamicLightsInitializer.ENTRYPOINT_KEY);
+
+		if (entrypointValue.getType() != CustomValue.CvType.STRING) {
+			error(LOGGER, "Ignoring {} entrypoint from mod {}: not a string", DynamicLightsInitializer.ENTRYPOINT_KEY, id);
+			return;
+		}
+
+		try {
+			var initializer = LanguageAdapter.getDefault().create(mod, entrypointValue.getAsString(), DynamicLightsInitializer.class);
+			this.invokeInitializer(initializer);
+		} catch (LanguageAdapterException e) {
+			error(LOGGER, "Failed to initializer {} entrypoint from mod {}: exception thrown", DynamicLightsInitializer.ENTRYPOINT_KEY, id, e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void invokeInitializer(DynamicLightsInitializer initializer) {
+		initializer.onInitializeDynamicLights(this.itemLightSources, this.entityLightSources);
 	}
 
 	/**
@@ -329,6 +380,20 @@ public class LambDynLights implements ClientModInitializer {
 		}
 
 		logger.warn(msg, args);
+	}
+
+	/**
+	 * Logs an error message.
+	 *
+	 * @param logger the logger to use
+	 * @param msg the message to log
+	 */
+	public static void error(Logger logger, String msg, Object... args) {
+		if (!FabricLoader.getInstance().isDevelopmentEnvironment()) {
+			msg = "[LambDynLights] " + msg;
+		}
+
+		logger.error(msg, args);
 	}
 
 	/**
