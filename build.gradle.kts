@@ -18,17 +18,24 @@ if (!(System.getenv("CURSEFORGE_TOKEN") != null || System.getenv("MODRINTH_TOKEN
 }
 logger.lifecycle("Preparing version ${version}...")
 
+val fabricApiModules = listOf(
+	fabricApi.module("fabric-lifecycle-events-v1", libs.versions.fabric.api.get())!!,
+	fabricApi.module("fabric-resource-loader-v0", libs.versions.fabric.api.get())!!,
+	fabricApi.module("fabric-rendering-v1", libs.versions.fabric.api.get())!!
+)
+
 tasks.generateFmj.configure {
-	this.fmj.get()
+	val fmj = this.fmj.get()
 		.withEntrypoints("client", "dev.lambdaurora.lambdynlights.LambDynLights")
 		.withEntrypoints("modmenu", "dev.lambdaurora.lambdynlights.LambDynLightsModMenu")
 		.withAccessWidener("lambdynlights.accesswidener")
 		.withMixins("lambdynlights.mixins.json", "lambdynlights.lightsource.mixins.json")
 		.withDepend("${Constants.NAMESPACE}_api", ">=${version}")
-		.withDepend("fabric-api", ">=${libs.versions.fabric.api.get()}")
 		.withDepend("spruceui", ">=${libs.versions.spruceui.get()}")
 		.withRecommend("modmenu", ">=${libs.versions.modmenu.get()}")
 		.withBreak("optifabric", "*")
+
+	fabricApiModules.forEach { module -> fmj.withDepend(module.name, ">=${module.version}") }
 }
 
 repositories {
@@ -52,7 +59,7 @@ dependencies {
 	include(project(":api"))
 
 	modImplementation(libs.fabric.loader)
-	modImplementation(libs.fabric.api)
+	fabricApiModules.forEach { modImplementation(it) }
 
 	implementation(libs.nightconfig.core)
 	implementation(libs.nightconfig.toml)
