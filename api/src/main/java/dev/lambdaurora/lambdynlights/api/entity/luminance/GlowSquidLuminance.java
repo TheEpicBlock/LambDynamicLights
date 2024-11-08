@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 /**
- * Represents the luminance value of a glow squid.
+ * Provides the luminance value of a glow squid.
  *
  * @author LambdAurora
  * @version 4.0.0

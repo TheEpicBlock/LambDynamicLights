@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * Represents the luminance value of a provided item.
+ * Provides the luminance value of a given item.
  *
  * @param item the item to derive the luminance value from
  * @param includeRain {@code true} if the wetness check should include rain, or {@code false} otherwise

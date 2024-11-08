@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 /**
- * Represents the luminance value from a Minecart's display block.
+ * Provides the luminance value from a Minecart's display block.
  *
  * @author LambdAurora
  * @version 4.0.0

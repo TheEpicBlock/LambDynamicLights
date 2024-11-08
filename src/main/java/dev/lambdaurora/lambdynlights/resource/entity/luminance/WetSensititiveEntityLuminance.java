@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Range;
 import java.util.List;
 
 /**
- * Represents a conditional luminance value depending on whether the entity is wet or dry.
+ * Provides a conditional luminance value depending on whether the entity is wet or dry.
  *
  * @param dry the luminance values if the entity is dry
  * @param wet the luminance values if the entity is wet
