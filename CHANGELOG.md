@@ -240,6 +240,7 @@
   - This affects both block and item displays.
   - If a custom brightness is defined then dynamic lighting disables itself.
 - Refactored heavily the ticking of entity dynamic lighting to make it more abstract.
+- Fixed API publication for loom-based setups.
 
 [SpruceUI]: https://github.com/LambdAurora/SpruceUI "SpruceUI page"
 [pridelib]: https://github.com/Queerbric/pridelib "Pridelib page"
