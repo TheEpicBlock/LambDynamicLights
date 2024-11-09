@@ -30,13 +30,13 @@ tasks.remapJar {
 apiProject.configurations["mojmapApiElements"].artifacts.removeIf{
 	true
 }
-apiProject.artifacts.add("mojmapApiElements", tasks.remapJar.map { it.archiveFile }) {
+apiProject.artifacts.add("mojmapApiElements", tasks.remapJar) {
 	classifier = "mojmap"
 }
 apiProject.configurations["mojmapRuntimeElements"].artifacts.removeIf{
 	true
 }
-apiProject.artifacts.add("mojmapRuntimeElements", tasks.remapJar.map { it.archiveFile }) {
+apiProject.artifacts.add("mojmapRuntimeElements", tasks.remapJar) {
 	classifier = "mojmap"
 }
 
@@ -55,6 +55,6 @@ val remapMojmapSourcesTask = tasks.register("remapMojmapSourcesJar", RemapSource
 apiProject.configurations["mojmapSourcesElements"].artifacts.removeIf {
 	true
 }
-apiProject.artifacts.add("mojmapSourcesElements", remapMojmapSourcesTask.map { it.archiveFile }) {
+apiProject.artifacts.add("mojmapSourcesElements", remapMojmapSourcesTask) {
 	classifier = "mojmap-sources"
 }
