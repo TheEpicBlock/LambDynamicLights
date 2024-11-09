@@ -46,7 +46,7 @@ val remapMojmapSourcesTask = tasks.register("remapMojmapSourcesJar", RemapSource
 
 	classpath.setFrom((loom as LoomGradleExtension).getMinecraftJarsCollection(MappingsNamespace.INTERMEDIARY))
 	inputFile.convention(remapJar.flatMap { it.archiveFile })
-	archiveClassifier = "moj"
+	archiveClassifier = "sources"
 	sourceNamespace = "intermediary"
 	targetNamespace = "named"
 }
