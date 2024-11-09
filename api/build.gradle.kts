@@ -22,6 +22,20 @@ tasks.generateFmj.configure {
 		}
 }
 
+val mojmap by sourceSets.creating {}
+
+java {
+	registerFeature("mojmap") {
+		usingSourceSet(mojmap)
+		withSourcesJar()
+
+		afterEvaluate {
+			configurations["mojmapApiElements"].extendsFrom(configurations["apiElements"])
+			configurations["mojmapRuntimeElements"].extendsFrom(configurations["runtimeElements"])
+		}
+	}
+}
+
 // Configure the maven publication.
 publishing {
 	publications {
