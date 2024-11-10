@@ -1,5 +1,6 @@
 package lambdynamiclights.task
 
+import com.google.gson.FormattingStyle
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import lambdynamiclights.data.Fmj
@@ -39,7 +40,7 @@ abstract class GenerateFmjTask @Inject constructor() : DefaultTask() {
 	companion object {
 		val GSON: Gson = GsonBuilder()
 			.registerTypeAdapter(Fmj::class.java, Fmj.Serializer())
-			.setPrettyPrinting()
+			.setFormattingStyle(FormattingStyle.PRETTY.withIndent("\t"))
 			.create()
 	}
 }
