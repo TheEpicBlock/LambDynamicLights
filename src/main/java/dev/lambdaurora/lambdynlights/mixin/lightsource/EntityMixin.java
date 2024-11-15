@@ -105,9 +105,9 @@ public abstract class EntityMixin implements DynamicLightSourceBehavior {
 
 	@Override
 	public void updateDynamicLightPreviousCoordinates() {
-		this.lambdynlights$prevX = this.getX();
-		this.lambdynlights$prevY = this.getY();
-		this.lambdynlights$prevZ = this.getZ();
+		this.lambdynlights$prevX = this.getDynamicLightX();
+		this.lambdynlights$prevY = this.getDynamicLightY();
+		this.lambdynlights$prevZ = this.getDynamicLightZ();
 	}
 
 	@Override
