@@ -11,6 +11,7 @@ package dev.lambdaurora.lambdynlights.engine;
 
 import dev.lambdaurora.lambdynlights.LambDynLights;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Range;
 
 /**
  * Represents a dynamic light source.
@@ -53,6 +54,7 @@ public interface DynamicLightSource {
 	 * {@return the luminance of the light source}
 	 * The maximum is 15, values below 1 are ignored.
 	 */
+	@Range(from = 0, to = 15)
 	int getLuminance();
 
 	/**

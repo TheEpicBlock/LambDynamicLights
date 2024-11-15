@@ -14,6 +14,7 @@ import dev.lambdaurora.lambdynlights.api.DynamicLightsInitializer;
 import dev.lambdaurora.lambdynlights.engine.DynamicLightSource;
 import dev.lambdaurora.lambdynlights.engine.DynamicLightSourceBehavior;
 import dev.lambdaurora.lambdynlights.engine.DynamicLightingEngine;
+import dev.lambdaurora.lambdynlights.engine.LightCollection;
 import dev.lambdaurora.lambdynlights.resource.entity.EntityLightSources;
 import dev.lambdaurora.lambdynlights.resource.item.ItemLightSources;
 import dev.yumi.commons.event.EventManager;
@@ -72,6 +73,7 @@ public class LambDynLights implements ClientModInitializer {
 	public final EntityLightSources entityLightSources = new EntityLightSources(this.itemLightSources);
 	public final DynamicLightingEngine engine = new DynamicLightingEngine();
 	private final Set<DynamicLightSourceBehavior> dynamicLightSources = new HashSet<>();
+	private final Set<LightCollection> lightCollections = new HashSet<>(); // @TODO: check usefulness here
 	private final List<DynamicLightSourceBehavior> toClear = new ArrayList<>();
 	private final ReentrantReadWriteLock lightSourcesLock = new ReentrantReadWriteLock();
 	private long lastUpdate = System.currentTimeMillis();
@@ -94,7 +96,7 @@ public class LambDynLights implements ClientModInitializer {
 
 		ClientTickEvents.END_WORLD_TICK.register(level -> {
 			this.lightSourcesLock.writeLock().lock();
-			this.engine.computeSpatialLookup(this.dynamicLightSources);
+			this.engine.computeSpatialLookup(this.dynamicLightSources, this.lightCollections);
 			this.toClear.forEach(source -> source.lambdynlights$scheduleTrackedChunksRebuild(Minecraft.getInstance().levelRenderer));
 			this.toClear.clear();
 			this.lightSourcesLock.writeLock().unlock();
