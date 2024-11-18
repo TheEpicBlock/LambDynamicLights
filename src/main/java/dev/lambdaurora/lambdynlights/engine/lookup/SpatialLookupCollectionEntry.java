@@ -27,11 +27,11 @@ public record SpatialLookupCollectionEntry(int cellKey, long[] positions, byte[]
 	public double getDynamicLightLevel(@NotNull BlockPos pos) {
 		double maxLightLevel = 0.;
 
-		for (int i = 0; i < this.luminance.length; i++) {
-			int posIndex = i * 3;
-			double x = this.positions[posIndex] + 0.5;
-			double y = this.positions[posIndex + 1] + 0.5;
-			double z = this.positions[posIndex + 2] + 0.5;
+		for (int i = 0; i < this.positions.length; i++) {
+			long packed = this.positions[i];
+			double x = BlockPos.unpackLongX(packed) + 0.5;
+			double y = BlockPos.unpackLongY(packed) + 0.5;
+			double z = BlockPos.unpackLongZ(packed) + 0.5;
 			byte luminance = this.luminance[i];
 
 			double lightLevel = SpatialLookupEntry.lightAtPos(x, y, z, pos, luminance);

@@ -7,9 +7,11 @@
  * see the LICENSE file.
  */
 
-package dev.lambdaurora.lambdynlights.api.entity.luminance;
+package dev.lambdaurora.lambdynlights.resource.entity.luminance;
 
+import dev.lambdaurora.lambdynlights.api.entity.luminance.EntityLuminance;
 import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
+import dev.lambdaurora.lambdynlights.resource.entity.EntityLightSources;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.GlowSquid;
@@ -30,7 +32,7 @@ public final class GlowSquidLuminance implements EntityLuminance {
 
 	@Override
 	public @NotNull Type type() {
-		return Type.GLOW_SQUID;
+		return EntityLightSources.GLOW_SQUID;
 	}
 
 	@Override

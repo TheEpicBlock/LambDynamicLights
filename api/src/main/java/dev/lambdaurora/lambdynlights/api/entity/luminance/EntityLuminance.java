@@ -137,7 +137,6 @@ public interface EntityLuminance {
 		);
 		public static final Type ENDERMAN = registerSimple("enderman", EndermanLuminance.INSTANCE);
 		public static final Type FALLING_BLOCK = registerSimple("falling_block", FallingBlockLuminance.INSTANCE);
-		public static final Type GLOW_SQUID = registerSimple("glow_squid", GlowSquidLuminance.INSTANCE);
 		public static final Type ITEM = register("item", ItemDerivedEntityLuminance.CODEC);
 		public static final Type ITEM_ENTITY = registerSimple("item_entity", ItemEntityLuminance.INSTANCE);
 		public static final Type ITEM_FRAME = registerSimple("item_frame", ItemFrameLuminance.INSTANCE);

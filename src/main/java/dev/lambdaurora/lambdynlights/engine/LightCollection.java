@@ -15,6 +15,7 @@ import it.unimi.dsi.fastutil.bytes.ByteList;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
+import net.minecraft.core.BlockPos;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,23 +26,21 @@ public record LightCollection(Collection<LightCollectionEntry> entries) {
 		record Data(LongList position, ByteList luminance) {}
 		var cellKeyToData = new Int2ObjectOpenHashMap<Data>();
 
-		for (var record : this.entries) {
-			int cellKey = DynamicLightingEngine.hashAt(record.x(), record.y(), record.z());
+		for (var entry : this.entries) {
+			int cellKey = DynamicLightingEngine.hashAt(entry.x(), entry.y(), entry.z());
 
 			var data = cellKeyToData.computeIfAbsent(cellKey, k -> new Data(new LongArrayList(), new ByteArrayList()));
 
-			data.position.add(record.x());
-			data.position.add(record.y());
-			data.position.add(record.z());
-			data.luminance.add((byte) record.luminance());
+			data.position.add(BlockPos.asLong(entry.x(), entry.y(), entry.z()));
+			data.luminance.add((byte) entry.luminance());
 		}
 
 		return cellKeyToData.int2ObjectEntrySet()
 				.stream()
 				.map(entry -> new SpatialLookupCollectionEntry(
 						entry.getIntKey(),
-						entry.getValue().position().toLongArray(),
-						entry.getValue().luminance().toByteArray()
+						entry.getValue().position.toLongArray(),
+						entry.getValue().luminance.toByteArray()
 				));
 	}
 
