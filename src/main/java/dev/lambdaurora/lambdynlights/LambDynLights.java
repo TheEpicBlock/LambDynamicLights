@@ -11,17 +11,16 @@ package dev.lambdaurora.lambdynlights;
 
 import dev.lambdaurora.lambdynlights.accessor.WorldRendererAccessor;
 import dev.lambdaurora.lambdynlights.api.DynamicLightsInitializer;
-import dev.lambdaurora.lambdynlights.engine.DynamicLightSource;
-import dev.lambdaurora.lambdynlights.engine.DynamicLightSourceBehavior;
 import dev.lambdaurora.lambdynlights.engine.DynamicLightingEngine;
-import dev.lambdaurora.lambdynlights.engine.LightCollection;
+import dev.lambdaurora.lambdynlights.engine.source.DynamicLightSource;
+import dev.lambdaurora.lambdynlights.engine.source.EntityDynamicLightSource;
+import dev.lambdaurora.lambdynlights.engine.source.EntityDynamicLightSourceBehavior;
 import dev.lambdaurora.lambdynlights.resource.entity.EntityLightSources;
 import dev.lambdaurora.lambdynlights.resource.item.ItemLightSources;
+import dev.lambdaurora.lambdynlights.util.DynamicLightDebugRenderer;
 import dev.yumi.commons.event.EventManager;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
@@ -35,17 +34,16 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.ChunkSectionPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.io.ResourceType;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockAndTintGetter;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,15 +66,19 @@ public class LambDynLights implements ClientModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger("LambDynamicLights");
 	public static final EventManager<Identifier> EVENT_MANAGER = new EventManager<>(LambDynLightsConstants.id("default"), Identifier::parse);
 	private static LambDynLights INSTANCE;
+
 	public final DynamicLightsConfig config = new DynamicLightsConfig(this);
 	public final ItemLightSources itemLightSources = new ItemLightSources();
 	public final EntityLightSources entityLightSources = new EntityLightSources(this.itemLightSources);
 	public final DynamicLightingEngine engine = new DynamicLightingEngine();
-	private final Set<DynamicLightSourceBehavior> dynamicLightSources = new HashSet<>();
-	private final Set<LightCollection> lightCollections = new HashSet<>(); // @TODO: check usefulness here
-	private final List<DynamicLightSourceBehavior> toClear = new ArrayList<>();
+	private final Set<DynamicLightSource> dynamicLightSources = new HashSet<>();
+	private final List<DynamicLightSource> toClear = new ArrayList<>();
 	private final ReentrantReadWriteLock lightSourcesLock = new ReentrantReadWriteLock();
+
+	public final DynamicLightDebugRenderer.SectionRebuild sectionRebuildDebugRenderer = new DynamicLightDebugRenderer.SectionRebuild(this);
+
 	private long lastUpdate = System.currentTimeMillis();
+	private boolean shouldTick;
 	private int lastUpdateCount = 0;
 
 	@Override
@@ -94,17 +96,49 @@ public class LambDynLights implements ClientModInitializer {
 			this.entityLightSources.apply(registries);
 		});
 
-		ClientTickEvents.END_WORLD_TICK.register(level -> {
-			this.lightSourcesLock.writeLock().lock();
-			this.engine.computeSpatialLookup(this.dynamicLightSources, this.lightCollections);
-			this.toClear.forEach(source -> source.lambdynlights$scheduleTrackedChunksRebuild(Minecraft.getInstance().levelRenderer));
-			this.toClear.clear();
-			this.lightSourcesLock.writeLock().unlock();
+		ClientTickEvents.START_WORLD_TICK.register(level -> {
+			var mode = this.config.getDynamicLightsMode();
+			boolean shouldTick = mode.isEnabled();
+
+			if (shouldTick && mode.hasDelay()) {
+				long currentTime = System.currentTimeMillis();
+				if (currentTime < this.lastUpdate + mode.getDelay()) {
+					shouldTick = false;
+				} else {
+					this.lastUpdate = currentTime;
+				}
+			}
+
+			this.shouldTick = shouldTick;
 		});
 
-		WorldRenderEvents.START.register(context -> {
-			Profiler.get().swap("dynamic_lighting");
-			this.updateAll(context.worldRenderer());
+		ClientTickEvents.END_WORLD_TICK.register(level -> {
+			var renderer = Minecraft.getInstance().levelRenderer;
+
+			this.lightSourcesLock.writeLock().lock();
+			Profiler.get().push("dynamic_lighting_compute_spatial_lookup");
+			this.engine.computeSpatialLookup(this.dynamicLightSources);
+			Profiler.get().pop();
+			this.toClear.forEach(source -> {
+				source.getDynamicLightChunksToRebuild(true).forEach(chunk -> this.scheduleChunkRebuild(renderer, chunk));
+			});
+			this.toClear.clear();
+			this.lightSourcesLock.writeLock().unlock();
+
+			this.lastUpdateCount = 0;
+
+			if (this.shouldTick) {
+				for (var lightSource : this.dynamicLightSources) {
+					var chunks = lightSource.getDynamicLightChunksToRebuild(false);
+
+					if (!chunks.isEmpty()) {
+						chunks.forEach(chunk -> this.scheduleChunkRebuild(renderer, chunk));
+						this.lastUpdateCount++;
+					}
+				}
+			}
+
+			this.sectionRebuildDebugRenderer.tick();
 		});
 
 		this.initializeApi();
@@ -175,9 +209,18 @@ public class LambDynLights implements ClientModInitializer {
 			this.lastUpdateCount = 0;
 
 			for (var lightSource : this.dynamicLightSources) {
-				if (lightSource.lambdynlights$updateDynamicLight(renderer)) this.lastUpdateCount++;
+				var chunks = lightSource.getDynamicLightChunksToRebuild(false);
+
+				if (!chunks.isEmpty()) {
+					chunks.forEach(chunk -> this.scheduleChunkRebuild(renderer, chunk));
+					this.lastUpdateCount++;
+				}
 			}
 		}
+	}
+
+	public boolean shouldTick() {
+		return this.shouldTick;
 	}
 
 	/**
@@ -243,7 +286,7 @@ public class LambDynLights implements ClientModInitializer {
 	 *
 	 * @param lightSource the light source to add
 	 */
-	public void addLightSource(@NotNull DynamicLightSourceBehavior lightSource) {
+	public void addLightSource(@NotNull EntityDynamicLightSourceBehavior lightSource) {
 		if (!lightSource.dynamicLightWorld().isClientSide())
 			return;
 		if (!this.config.getDynamicLightsMode().isEnabled())
@@ -259,7 +302,7 @@ public class LambDynLights implements ClientModInitializer {
 	 * @param lightSource the light source to check
 	 * @return {@code true} if the light source is tracked, else {@code false}
 	 */
-	public boolean containsLightSource(@NotNull DynamicLightSource lightSource) {
+	public boolean containsLightSource(@NotNull EntityDynamicLightSource lightSource) {
 		if (!lightSource.dynamicLightWorld().isClientSide())
 			return false;
 
@@ -280,13 +323,13 @@ public class LambDynLights implements ClientModInitializer {
 	 *
 	 * @param lightSource the light source to remove
 	 */
-	public void removeLightSource(@NotNull DynamicLightSourceBehavior lightSource) {
-		var dynamicLightSources = this.dynamicLightSources.iterator();
+	public void removeLightSource(@NotNull EntityDynamicLightSourceBehavior lightSource) {
+		var chunkProviders = this.dynamicLightSources.iterator();
 		DynamicLightSource it;
-		while (dynamicLightSources.hasNext()) {
-			it = dynamicLightSources.next();
+		while (chunkProviders.hasNext()) {
+			it = chunkProviders.next();
 			if (it.equals(lightSource)) {
-				dynamicLightSources.remove();
+				chunkProviders.remove();
 				this.toClear.add(lightSource);
 				break;
 			}
@@ -297,13 +340,13 @@ public class LambDynLights implements ClientModInitializer {
 	 * Clears light sources.
 	 */
 	public void clearLightSources() {
-		var dynamicLightSources = this.dynamicLightSources.iterator();
-		DynamicLightSourceBehavior it;
-		while (dynamicLightSources.hasNext()) {
-			it = dynamicLightSources.next();
-			dynamicLightSources.remove();
-			if (it.getLuminance() > 0)
-				it.resetDynamicLight();
+		var chunkProviders = this.dynamicLightSources.iterator();
+		DynamicLightSource it;
+		while (chunkProviders.hasNext()) {
+			it = chunkProviders.next();
+			chunkProviders.remove();
+			if (it instanceof EntityDynamicLightSource entityIt && entityIt.getLuminance() > 0)
+				entityIt.resetDynamicLight();
 			this.toClear.add(it);
 		}
 	}
@@ -313,17 +356,16 @@ public class LambDynLights implements ClientModInitializer {
 	 *
 	 * @param filter the removal filter
 	 */
-	public void removeLightSources(@NotNull Predicate<DynamicLightSourceBehavior> filter) {
+	public void removeLightSources(@NotNull Predicate<EntityDynamicLightSourceBehavior> filter) {
 		var dynamicLightSources = this.dynamicLightSources.iterator();
-		DynamicLightSourceBehavior it;
+		DynamicLightSource it;
 		while (dynamicLightSources.hasNext()) {
 			it = dynamicLightSources.next();
-			if (filter.test(it)) {
+			if (it instanceof EntityDynamicLightSourceBehavior lightSource && filter.test(lightSource)) {
 				dynamicLightSources.remove();
-				if (it.getLuminance() > 0)
-					it.resetDynamicLight();
-				this.toClear.add(it);
-				break;
+				if (lightSource.getLuminance() > 0)
+					lightSource.resetDynamicLight();
+				this.toClear.add(lightSource);
 			}
 		}
 	}
@@ -333,13 +375,6 @@ public class LambDynLights implements ClientModInitializer {
 	 */
 	public void removeEntitiesLightSource() {
 		this.removeLightSources(lightSource -> (lightSource instanceof Entity && !(lightSource instanceof Player)));
-	}
-
-	/**
-	 * Removes TNT light sources from tracked light sources.
-	 */
-	public void removeTntLightSources() {
-		this.removeLightSources(entity -> entity instanceof PrimedTnt);
 	}
 
 	/**
@@ -402,20 +437,11 @@ public class LambDynLights implements ClientModInitializer {
 	 * Schedules a chunk rebuild at the specified chunk position.
 	 *
 	 * @param renderer the renderer
-	 * @param chunkPos the chunk position
-	 */
-	public static void scheduleChunkRebuild(@NotNull LevelRenderer renderer, @NotNull BlockPos chunkPos) {
-		scheduleChunkRebuild(renderer, chunkPos.getX(), chunkPos.getY(), chunkPos.getZ());
-	}
-
-	/**
-	 * Schedules a chunk rebuild at the specified chunk position.
-	 *
-	 * @param renderer the renderer
 	 * @param chunkPos the packed chunk position
 	 */
-	public static void scheduleChunkRebuild(@NotNull LevelRenderer renderer, long chunkPos) {
-		scheduleChunkRebuild(renderer, BlockPos.unpackLongX(chunkPos), BlockPos.unpackLongY(chunkPos), BlockPos.unpackLongZ(chunkPos));
+	private void scheduleChunkRebuild(@NotNull LevelRenderer renderer, long chunkPos) {
+		scheduleChunkRebuild(renderer, ChunkSectionPos.x(chunkPos), ChunkSectionPos.y(chunkPos), ChunkSectionPos.z(chunkPos));
+		this.sectionRebuildDebugRenderer.scheduleChunkRebuild(chunkPos);
 	}
 
 	public static void scheduleChunkRebuild(@NotNull LevelRenderer renderer, int x, int y, int z) {
@@ -424,28 +450,11 @@ public class LambDynLights implements ClientModInitializer {
 	}
 
 	/**
-	 * Updates the tracked chunk sets.
-	 *
-	 * @param chunkPos the packed chunk position
-	 * @param old the set of old chunk coordinates to remove this chunk from it
-	 * @param newPos the set of new chunk coordinates to add this chunk to it
-	 */
-	public static void updateTrackedChunks(@NotNull BlockPos chunkPos, @Nullable LongOpenHashSet old, @Nullable LongOpenHashSet newPos) {
-		if (old != null || newPos != null) {
-			long pos = chunkPos.asLong();
-			if (old != null)
-				old.remove(pos);
-			if (newPos != null)
-				newPos.add(pos);
-		}
-	}
-
-	/**
 	 * Updates the dynamic lights tracking.
 	 *
 	 * @param lightSource the light source
 	 */
-	public static void updateTracking(@NotNull DynamicLightSourceBehavior lightSource) {
+	public static void updateTracking(@NotNull EntityDynamicLightSourceBehavior lightSource) {
 		boolean enabled = lightSource.isDynamicLightEnabled();
 		int luminance = lightSource.getLuminance();
 

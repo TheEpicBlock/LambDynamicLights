@@ -12,13 +12,14 @@ package dev.lambdaurora.lambdynlights.engine;
 import dev.lambdaurora.lambdynlights.LambDynLights;
 import dev.lambdaurora.lambdynlights.accessor.DynamicLightHandlerHolder;
 import dev.lambdaurora.lambdynlights.engine.lookup.SpatialLookupEntry;
-import dev.lambdaurora.lambdynlights.engine.lookup.SpatialLookupLightSourceEntry;
+import dev.lambdaurora.lambdynlights.engine.source.DynamicLightSource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,12 +35,13 @@ import java.util.Comparator;
 public final class DynamicLightingEngine {
 	public static final double MAX_RADIUS = 7.75;
 	public static final double MAX_RADIUS_SQUARED = MAX_RADIUS * MAX_RADIUS;
-	private static final int CELL_SIZE = MathHelper.ceil(MAX_RADIUS);
-	public static final int MAX_LIGHT_SOURCES = 1024;
+	public static final int CELL_SIZE = MathHelper.ceil(MAX_RADIUS);
+	public static final int MAX_LIGHT_SOURCES = 4096;
 	private static final Vec3i[] CELL_OFFSETS;
 
 	private final SpatialLookupEntry[] spatialLookupEntries = new SpatialLookupEntry[MAX_LIGHT_SOURCES];
 	private final int[] startIndices = new int[MAX_LIGHT_SOURCES];
+	private final long[] computeSpatialLookupTimes = new long[40];
 
 	/**
 	 * Returns whether the given entity can light up or not.
@@ -96,7 +98,24 @@ public final class DynamicLightingEngine {
 		return MathHelper.clamp(result, 0, 15);
 	}
 
-	static int hashAt(int x, int y, int z) {
+	/**
+	 * {@return the average time it took in nanoseconds to compute spatial lookup across 40 ticks}
+	 */
+	public float getComputeSpatialLookupTime() {
+		return (float) Arrays.stream(this.computeSpatialLookupTimes)
+				.filter(value -> value > 0)
+				.average()
+				.orElse(0);
+	}
+
+	/**
+	 * {@return the cell hash at the given block position}
+	 *
+	 * @param x the X block coordinate
+	 * @param y the Y block coordinate
+	 * @param z the Z block coordinate
+	 */
+	public static int hashAt(int x, int y, int z) {
 		return hashCell(
 				positionToCell(x),
 				positionToCell(y),
@@ -104,38 +123,53 @@ public final class DynamicLightingEngine {
 		);
 	}
 
-	private static int positionToCell(int coord) {
-		return coord / CELL_SIZE;
+	/**
+	 * {@return the cell coordinate of the given block position}
+	 *
+	 * @param coordinate the block position coordinate
+	 */
+	public static int positionToCell(int coordinate) {
+		// Equivalent to coordinate / CELL_SIZE as long as CELL_SIZE is equals to 8.
+		return coordinate >> 3;
 	}
 
-	private static int hashCell(int cellX, int cellY, int cellZ) {
-		return Math.abs(cellX * 751 + cellY * 86399 + cellZ * 284593) % MAX_LIGHT_SOURCES;
+	/**
+	 * Hashes the given cell coordinates.
+	 *
+	 * @param cellX the cell X-coordinate
+	 * @param cellY the cell Y-coordinate
+	 * @param cellZ the cell Z-coordinate
+	 * @return the cell hash
+	 */
+	public static int hashCell(int cellX, int cellY, int cellZ) {
+		return Math.abs(((cellX + 31) * 19 + cellY) * 41 + cellZ) * 83 & (MAX_LIGHT_SOURCES - 1);
 	}
 
-	public void computeSpatialLookup(Collection<? extends DynamicLightSource> dynamicLightSources, Collection<LightCollection> lightCollections) {
+	/**
+	 * Computes the spatial lookup given the light sources.
+	 * <p>
+	 * The spatial lookup will allow for a very quick and efficient lookup of relevant light sources at a given position.
+	 *
+	 * @param lightSources the light sources to compute into a spatial lookup
+	 */
+	public void computeSpatialLookup(Collection<? extends DynamicLightSource> lightSources) {
+		long startTime = System.nanoTime();
+
 		Arrays.fill(this.spatialLookupEntries, null);
 		Arrays.fill(this.startIndices, Integer.MAX_VALUE);
 
+		var it = lightSources.stream()
+				.flatMap(DynamicLightSource::splitIntoDynamicLightEntries)
+				.limit(MAX_LIGHT_SOURCES)
+				.sorted(Comparator.comparingInt(SpatialLookupEntry::cellKey))
+				.iterator();
+
 		int i = 0;
-
-		for (var source : dynamicLightSources) {
-			if (i == MAX_LIGHT_SOURCES) break;
-
-			int x = (int) source.getDynamicLightX();
-			int y = (int) source.getDynamicLightY();
-			int z = (int) source.getDynamicLightZ();
-
-			int cellKey = hashAt(x, y, z);
-			this.spatialLookupEntries[i] = new SpatialLookupLightSourceEntry(cellKey, source);
-
+		while (it.hasNext()) {
+			var entry = it.next();
+			this.spatialLookupEntries[i] = entry;
 			i++;
 		}
-
-		var lightCollectionChunks = lightCollections.stream().flatMap(LightCollection::split).toArray(SpatialLookupEntry[]::new);
-		int maxChunks = Math.min(i + lightCollectionChunks.length, MAX_LIGHT_SOURCES) - i;
-		System.arraycopy(lightCollectionChunks, 0, this.spatialLookupEntries, i, maxChunks);
-
-		Arrays.sort(this.spatialLookupEntries, Comparator.comparingInt(entry -> entry == null ? Integer.MAX_VALUE : entry.cellKey()));
 
 		for (i = 0; i < MAX_LIGHT_SOURCES; i++) {
 			if (this.spatialLookupEntries[i] == null) break;
@@ -147,6 +181,32 @@ public final class DynamicLightingEngine {
 				this.startIndices[key] = i;
 			}
 		}
+
+		long endTime = System.nanoTime();
+		for (i = 0; i < this.computeSpatialLookupTimes.length - 1; i++) {
+			this.computeSpatialLookupTimes[i] = this.computeSpatialLookupTimes[i + 1];
+		}
+		this.computeSpatialLookupTimes[this.computeSpatialLookupTimes.length - 1] = endTime - startTime;
+	}
+
+	@VisibleForTesting
+	public boolean hasEntriesAt(int cellX, int cellY, int cellZ) {
+		int key = hashCell(cellX, cellY, cellZ);
+		return this.startIndices[key] < MAX_LIGHT_SOURCES;
+	}
+
+	@VisibleForTesting
+	public int getEntryCountAt(int cellX, int cellY, int cellZ) {
+		int key = hashCell(cellX, cellY, cellZ);
+		int startIndex = this.startIndices[key];
+		int count = 0;
+		for (int i = startIndex; i < this.spatialLookupEntries.length; i++) {
+			SpatialLookupEntry entry = this.spatialLookupEntries[i];
+			if (entry == null || entry.cellKey() != key) break;
+
+			count++;
+		}
+		return count;
 	}
 
 	static {

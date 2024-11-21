@@ -1,21 +1,22 @@
 {
-  "required": true,
-  "package": "dev.lambdaurora.lambdynlights.mixin",
-  "plugin": "dev.lambdaurora.lambdynlights.LambDynLightsMixinPlugin",
-  "compatibilityLevel": "JAVA_21",
-  "client": [
-    "ClientLevelMixin",
-    "CommonLevelRendererMixin",
-    "DebugScreenOverlayMixin",
-    "DevModeMixin",
-    "EntityRendererMixin",
-    "EntityTypeMixin",
-    "MinecraftClientMixin",
-    "VideoSettingsScreenMixin",
-    "sodium.SodiumOptionsGuiMixin",
-    "fabric.AoCalculatorMixin"
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  }
+	"required": true,
+	"package": "dev.lambdaurora.lambdynlights.mixin",
+	"plugin": "dev.lambdaurora.lambdynlights.LambDynLightsMixinPlugin",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"ClientLevelMixin",
+		"CommonLevelRendererMixin",
+		"DebugRendererMixin",
+		"DebugScreenOverlayMixin",
+		"DevModeMixin",
+		"EntityRendererMixin",
+		"EntityTypeMixin",
+		"MinecraftClientMixin",
+		"VideoSettingsScreenMixin",
+		"fabric.AoCalculatorMixin",
+		"sodium.SodiumOptionsGuiMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
 }

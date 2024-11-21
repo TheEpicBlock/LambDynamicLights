@@ -10,19 +10,22 @@
 package dev.lambdaurora.lambdynlights.engine;
 
 import dev.lambdaurora.lambdynlights.engine.lookup.SpatialLookupCollectionEntry;
+import dev.lambdaurora.lambdynlights.engine.lookup.SpatialLookupEntry;
+import dev.lambdaurora.lambdynlights.engine.source.DynamicLightSource;
 import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.bytes.ByteList;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-public record LightCollection(Collection<LightCollectionEntry> entries) {
-	public Stream<SpatialLookupCollectionEntry> split() {
+public record LightCollection(Collection<LightCollectionEntry> entries) implements DynamicLightSource {
+	public Stream<SpatialLookupEntry> splitIntoDynamicLightEntries() {
 		record Data(LongList position, ByteList luminance) {}
 		var cellKeyToData = new Int2ObjectOpenHashMap<Data>();
 
@@ -44,6 +47,11 @@ public record LightCollection(Collection<LightCollectionEntry> entries) {
 				));
 	}
 
+	@Override
+	public LongSet getDynamicLightChunksToRebuild(boolean forced) {
+		return null;
+	}
+
 	public static LightCollection cuboid(int startX, int startY, int startZ, int endX, int endY, int endZ, int luminance) {
 		var entries = new ArrayList<LightCollectionEntry>();
 
@@ -57,8 +65,4 @@ public record LightCollection(Collection<LightCollectionEntry> entries) {
 
 		return new LightCollection(entries);
 	}
-
-	/*public static LightCollection line(int startX, int startY, int startZ, int endX, int endY, int endZ, int luminance) {
-		HashMap<Vec3i, Double> blocks = new HashMap<>();
-	}*/
 }

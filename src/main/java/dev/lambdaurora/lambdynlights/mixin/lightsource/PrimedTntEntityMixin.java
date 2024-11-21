@@ -11,7 +11,7 @@ package dev.lambdaurora.lambdynlights.mixin.lightsource;
 
 import dev.lambdaurora.lambdynlights.ExplosiveLightingMode;
 import dev.lambdaurora.lambdynlights.LambDynLights;
-import dev.lambdaurora.lambdynlights.engine.DynamicLightSource;
+import dev.lambdaurora.lambdynlights.engine.source.EntityDynamicLightSource;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.PrimedTnt;
@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PrimedTnt.class)
-public abstract class PrimedTntEntityMixin extends EntityMixin implements DynamicLightSource {
+public abstract class PrimedTntEntityMixin extends EntityMixin implements EntityDynamicLightSource {
 	@Shadow
 	public abstract int getFuse();
 
