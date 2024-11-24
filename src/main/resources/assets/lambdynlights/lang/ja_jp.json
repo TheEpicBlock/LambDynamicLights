@@ -1,6 +1,5 @@
 {
 	"modmenu.descriptionTranslation.lambdynlights": "臨場感ある光源を追加します．",
-
 	"lambdynlights.menu.light_sources": "臨場感ある光源",
 	"lambdynlights.menu.title": "LambDynamicLights 設定",
 	"lambdynlights.menu.canvas.1": "Canvasを使用している場合はエンティティの臨場感ある光源をオフにすることを推奨します！",
