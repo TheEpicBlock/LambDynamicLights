@@ -14,7 +14,7 @@ import net.minecraft.core.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents a dynamic light source entry in a spatial lookup.
+ * Represents an entity dynamic light source entry in a spatial lookup.
  *
  * @param cellKey the cell key of this entry
  * @param source the dynamic light source associated with this entry

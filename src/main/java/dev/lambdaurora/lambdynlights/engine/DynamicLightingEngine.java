@@ -9,6 +9,7 @@
 
 package dev.lambdaurora.lambdynlights.engine;
 
+import dev.lambdaurora.lambdynlights.DynamicLightsConfig;
 import dev.lambdaurora.lambdynlights.LambDynLights;
 import dev.lambdaurora.lambdynlights.accessor.DynamicLightHandlerHolder;
 import dev.lambdaurora.lambdynlights.engine.lookup.SpatialLookupEntry;
@@ -42,6 +43,12 @@ public final class DynamicLightingEngine {
 	private final SpatialLookupEntry[] spatialLookupEntries = new SpatialLookupEntry[MAX_LIGHT_SOURCES];
 	private final int[] startIndices = new int[MAX_LIGHT_SOURCES];
 	private final long[] computeSpatialLookupTimes = new long[40];
+	private int lastEntryCount = 0;
+	private final DynamicLightsConfig config;
+
+	public DynamicLightingEngine(DynamicLightsConfig config) {
+		this.config = config;
+	}
 
 	/**
 	 * Returns whether the given entity can light up or not.
@@ -69,6 +76,10 @@ public final class DynamicLightingEngine {
 	 * @return the dynamic light level at the specified position
 	 */
 	public double getDynamicLightLevel(@NotNull BlockPos pos) {
+		if (!this.config.getDynamicLightsMode().isEnabled()) {
+			return 0;
+		}
+
 		double result = 0;
 
 		var currentCell = new BlockPos.Mutable(
@@ -102,6 +113,10 @@ public final class DynamicLightingEngine {
 	 * {@return the average time it took in nanoseconds to compute spatial lookup across 40 ticks}
 	 */
 	public float getComputeSpatialLookupTime() {
+		if (!this.config.getDynamicLightsMode().isEnabled()) {
+			return 0.f; // We do not compute the spatial lookup when the mod is disabled.
+		}
+
 		return (float) Arrays.stream(this.computeSpatialLookupTimes)
 				.filter(value -> value > 0)
 				.average()
@@ -172,7 +187,10 @@ public final class DynamicLightingEngine {
 		}
 
 		for (i = 0; i < MAX_LIGHT_SOURCES; i++) {
-			if (this.spatialLookupEntries[i] == null) break;
+			if (this.spatialLookupEntries[i] == null) {
+				this.lastEntryCount = i;
+				break;
+			};
 
 			int key = this.spatialLookupEntries[i].cellKey();
 			int previousKey = i == 0 ? Integer.MAX_VALUE : this.spatialLookupEntries[i - 1].cellKey();
@@ -207,6 +225,11 @@ public final class DynamicLightingEngine {
 			count++;
 		}
 		return count;
+	}
+
+	@VisibleForTesting
+	public int getLastEntryCount() {
+		return this.lastEntryCount;
 	}
 
 	static {

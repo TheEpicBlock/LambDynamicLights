@@ -9,6 +9,7 @@
 
 package dev.lambdaurora.lambdynlights.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import dev.lambdaurora.lambdynlights.engine.source.EntityDynamicLightSourceBehavior;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
@@ -40,9 +41,8 @@ public abstract class ClientLevelMixin {
 		EntityDynamicLightSourceBehavior.tickEntity(passenger);
 	}
 
-	@Inject(method = "removeEntity(ILnet/minecraft/world/entity/Entity$RemovalReason;)V", at = @At("HEAD"))
-	private void lambdynlights$onFinishRemovingEntity(int entityId, Entity.RemovalReason removalReason, CallbackInfo ci) {
-		var entity = this.getEntities().get(entityId);
+	@Inject(method = "removeEntity(ILnet/minecraft/world/entity/Entity$RemovalReason;)V", at = @At("RETURN"))
+	private void lambdynlights$onFinishRemovingEntity(int entityId, Entity.RemovalReason removalReason, CallbackInfo ci, @Local Entity entity) {
 		if (entity != null) {
 			var dls = (EntityDynamicLightSourceBehavior) entity;
 			dls.setDynamicLightEnabled(false);

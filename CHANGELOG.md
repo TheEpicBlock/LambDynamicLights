@@ -239,9 +239,15 @@
 - Added display entities dynamic lighting ([#209](https://github.com/LambdAurora/LambDynamicLights/issues/209)).
   - This affects both block and item displays.
   - If a custom brightness is defined then dynamic lighting disables itself.
+- Added a new API to define fully custom dynamic lighting of varying shapes.
+  - Added dynamic lighting to beacon beams ([#115]).
+  - Added dynamic lighting to End gateway beams ([#115]).
+  - Added dynamic lighting to guardian lasers ([#115]).
 - Added debug settings and renderers to facilitate debugging.
   - Added a debug renderer to active dynamic lighting cells.
   - Added a debug renderer to display chunk rebuilds.
+  - Added a debug renderer to display the bounding boxes of custom dynamic light sources.
+- Updated the data displayed in the F3 HUD to show more information about dynamic lighting.
 - Refactored heavily the ticking of entity dynamic lighting to make it more abstract.
 - Refactored heavily how chunk rebuilds are queued and how dynamic light sources are represented.
 - Fixed API publication for loom-based setups.
@@ -250,3 +256,4 @@
 [pridelib]: https://github.com/Queerbric/pridelib "Pridelib page"
 [Sodium]: https://modrinth.com/mod/sodium "Sodium Modrinth page"
 [Canvas Renderer]: https://www.curseforge.com/minecraft/mc-mods/canvas-renderer "Canvas Renderer CurseForge page"
+[#115]: https://github.com/LambdAurora/LambDynamicLights/issues/115

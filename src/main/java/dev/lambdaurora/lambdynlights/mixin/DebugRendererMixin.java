@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(DebugRenderer.class)
 public class DebugRendererMixin {
 	@Unique
-	private final DynamicLightSectionDebugRenderer dynamicLightsDebugRenderer = new DynamicLightSectionDebugRenderer();
+	private final DynamicLightSectionDebugRenderer dynamicLightsSectionDebugRenderer = new DynamicLightSectionDebugRenderer();
 
 	@Inject(method = "render", at = @At("TAIL"))
 	private void lambdynlights$onRender(
@@ -32,8 +32,10 @@ public class DebugRendererMixin {
 			double x, double y, double z,
 			CallbackInfo ci
 	) {
-		LambDynLights.get().sectionRebuildDebugRenderer.render(matrices, bufferSource, x, y, z);
+		var mod = LambDynLights.get();
+		mod.sectionRebuildDebugRenderer.render(matrices, bufferSource, x, y, z);
+		mod.dynamicLightBehaviorDebugRenderer.render(matrices, bufferSource, x, y, z);
 
-		this.dynamicLightsDebugRenderer.render(matrices, bufferSource, x, y, z);
+		this.dynamicLightsSectionDebugRenderer.render(matrices, bufferSource, x, y, z);
 	}
 }

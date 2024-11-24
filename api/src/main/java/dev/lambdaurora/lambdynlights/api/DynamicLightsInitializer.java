@@ -9,9 +9,6 @@
 
 package dev.lambdaurora.lambdynlights.api;
 
-import dev.lambdaurora.lambdynlights.api.entity.EntityLightSourceManager;
-import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
-
 /**
  * Represents the entrypoint for LambDynamicLights' API.
  *
@@ -28,10 +25,14 @@ public interface DynamicLightsInitializer {
 	String ENTRYPOINT_KEY = "lambdynlights:initializer";
 
 	/**
-	 * Called when LambDynamicLights is initialized to register custom dynamic light handlers and item light sources.
+	 * Called when LambDynamicLights is initialized to register various objects related to dynamic lighting such as:
+	 * <ul>
+	 *     <li>entity luminance providers;</li>
+	 *     <li>item and entity light sources;</li>
+	 *     <li>custom dynamic lighting behavior.</li>
+	 * </ul>
 	 *
-	 * @param itemLightSourceManager the manager for item light sources
-	 * @param entityLightSourceManager the manager for entity light sources
+	 * @param context the dynamic lights context, containing references to managers for each source type provided by the API
 	 */
-	void onInitializeDynamicLights(ItemLightSourceManager itemLightSourceManager, EntityLightSourceManager entityLightSourceManager);
+	void onInitializeDynamicLights(DynamicLightsContext context);
 }

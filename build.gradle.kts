@@ -9,6 +9,7 @@ plugins {
 	id("com.gradleup.shadow").version("8.3.3")
 	id("com.modrinth.minotaur").version("2.+")
 	id("net.darkhax.curseforgegradle").version("1.1.+")
+	id("me.champeau.jmh").version("0.7.2")
 }
 
 base.archivesName.set(Constants.NAME)
@@ -173,6 +174,10 @@ tasks.register<TaskPublishCurseForge>("curseforge") {
 
 	mainFile.changelogType = "markdown"
 	mainFile.changelog = changelogContent
+}
+
+jmh {
+	fork = 3
 }
 
 // Configure the maven publication.

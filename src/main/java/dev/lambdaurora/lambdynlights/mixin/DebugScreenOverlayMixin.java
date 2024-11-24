@@ -13,8 +13,11 @@ import dev.lambdaurora.lambdynlights.LambDynLights;
 import dev.lambdaurora.lambdynlights.LambDynLightsConstants;
 import dev.lambdaurora.lambdynlights.engine.DynamicLightingEngine;
 import net.minecraft.TextFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.DebugScreenOverlay;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -30,6 +33,8 @@ import java.util.List;
  */
 @Mixin(DebugScreenOverlay.class)
 public class DebugScreenOverlayMixin {
+	@Shadow @Final private Minecraft minecraft;
+
 	@Inject(method = "getGameInformation", at = @At("RETURN"))
 	private void onGetLeftText(CallbackInfoReturnable<List<String>> cir) {
 		var prefix = TextFormatting.LIGHT_PURPLE + "[LDL] " + TextFormatting.RESET;
@@ -38,9 +43,11 @@ public class DebugScreenOverlayMixin {
 		var ldl = LambDynLights.get();
 		var builder = new StringBuilder(prefix + "Dynamic Light Sources: ");
 		builder.append(ldl.getLightSourcesCount())
-				.append("/")
+				.append(" (Occupying ")
+				.append(ldl.engine.getLastEntryCount())
+				.append('/')
 				.append(DynamicLightingEngine.MAX_LIGHT_SOURCES)
-				.append(" (U: ")
+				.append(" ; Updated: ")
 				.append(ldl.getLastUpdateCount());
 
 		if (!ldl.config.getDynamicLightsMode().isEnabled()) {
@@ -55,6 +62,9 @@ public class DebugScreenOverlayMixin {
 
 		list.add(prefix + "Compute Spatial Lookup Timing: %.3fms (avg. 40t)"
 				.formatted(ldl.engine.getComputeSpatialLookupTime() / 1_000_000.f));
+
+		list.add(prefix + "Dynamic Light At Feet: %.3f"
+				.formatted(ldl.engine.getDynamicLightLevel(this.minecraft.player.getBlockPos())));
 
 		if (LambDynLightsConstants.isDevMode()) {
 			list.add(TextFormatting.RED + LambDynLightsConstants.DEV_MODE_OVERLAY_TEXT);

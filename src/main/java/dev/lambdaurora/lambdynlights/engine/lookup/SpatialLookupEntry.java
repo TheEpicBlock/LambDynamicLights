@@ -44,8 +44,7 @@ public interface SpatialLookupEntry {
 		// 7.75 because else we would have to update more chunks and that's not a good idea.
 		// 15 (max range for blocks) would be too much and a bit cheaty.
 		if (distanceSquared <= DynamicLightingEngine.MAX_RADIUS_SQUARED) {
-			double multiplier = 1.0 - Math.sqrt(distanceSquared) / DynamicLightingEngine.MAX_RADIUS;
-			return multiplier * (double) luminance;
+			return luminance - Math.sqrt(distanceSquared) / DynamicLightingEngine.MAX_RADIUS * 15.;
 		}
 
 		return 0.;

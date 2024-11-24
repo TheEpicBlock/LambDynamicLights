@@ -10,14 +10,12 @@
 package dev.lambdaurora.lambdynlights.engine.source;
 
 import dev.lambdaurora.lambdynlights.LambDynLights;
+import dev.lambdaurora.lambdynlights.echo.GuardianEntityLightSource;
 import dev.lambdaurora.lambdynlights.engine.DynamicLightingEngine;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.ChunkSectionPos;
-import net.minecraft.core.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.Guardian;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
@@ -96,13 +94,13 @@ public interface EntityDynamicLightSourceBehavior extends EntityDynamicLightSour
 			}
 			LambDynLights.updateTracking(lightSource);
 		}
+
+		if (entity instanceof Guardian guardian) {
+			GuardianEntityLightSource.tick(guardian);
+		}
 	}
 
 	default LongSet getDynamicLightChunksToRebuild(boolean forced) {
-		if (forced) {
-			return this.lambdynlights$getTrackedLitChunkPos();
-		}
-
 		double x = this.getDynamicLightX();
 		double y = this.getDynamicLightY();
 		double z = this.getDynamicLightZ();
@@ -112,14 +110,14 @@ public interface EntityDynamicLightSourceBehavior extends EntityDynamicLightSour
 
 		int luminance = this.getLuminance();
 
-		if (Math.abs(deltaX) <= 0.1 && Math.abs(deltaY) <= 0.1 && Math.abs(deltaZ) <= 0.1 && luminance == this.getLastDynamicLuminance()) {
+		if (!forced && Math.abs(deltaX) <= 0.1 && Math.abs(deltaY) <= 0.1 && Math.abs(deltaZ) <= 0.1 && luminance == this.getLastDynamicLuminance()) {
 			return LongSet.of();
 		}
 
 		var newPos = new LongOpenHashSet();
 
 		if (luminance > 0) {
-			this.gatherClosestChunks(newPos, x, y, z);
+			DynamicLightSource.gatherClosestChunks(newPos, x, y, z);
 		}
 
 		var result = new LongOpenHashSet(newPos);
@@ -130,34 +128,6 @@ public interface EntityDynamicLightSourceBehavior extends EntityDynamicLightSour
 		this.lambdynlights$setTrackedLitChunkPos(newPos);
 
 		return result;
-	}
-
-	private void gatherClosestChunks(LongSet chunks, double x, double y, double z) {
-		var chunkPos = new BlockPos.Mutable(
-				ChunkSectionPos.blockToSectionCoord(x),
-				ChunkSectionPos.blockToSectionCoord(y),
-				ChunkSectionPos.blockToSectionCoord(z)
-		);
-
-		chunks.add(ChunkSectionPos.asLong(chunkPos.getX(), chunkPos.getY(), chunkPos.getZ()));
-
-		var directionX = (MathHelper.floor(x) & 15) >= 8 ? Direction.EAST : Direction.WEST;
-		var directionY = (MathHelper.floor(y) & 15) >= 8 ? Direction.UP : Direction.DOWN;
-		var directionZ = (MathHelper.floor(z) & 15) >= 8 ? Direction.SOUTH : Direction.NORTH;
-
-		for (int i = 0; i < 7; i++) {
-			if (i % 4 == 0) {
-				chunkPos.move(directionX); // X
-			} else if (i % 4 == 1) {
-				chunkPos.move(directionZ); // XZ
-			} else if (i % 4 == 2) {
-				chunkPos.move(directionX.getOpposite()); // Z
-			} else {
-				chunkPos.move(directionZ.getOpposite()); // origin
-				chunkPos.move(directionY); // Y
-			}
-			chunks.add(ChunkSectionPos.asLong(chunkPos.getX(), chunkPos.getY(), chunkPos.getZ()));
-		}
 	}
 
 	LongSet lambdynlights$getTrackedLitChunkPos();

@@ -11,8 +11,8 @@ package dev.lambdaurora.lambdynlights.engine.source;
 
 import dev.lambdaurora.lambdynlights.LambDynLights;
 import dev.lambdaurora.lambdynlights.engine.DynamicLightingEngine;
-import dev.lambdaurora.lambdynlights.engine.lookup.SpatialLookupEntry;
 import dev.lambdaurora.lambdynlights.engine.lookup.SpatialLookupEntityEntry;
+import dev.lambdaurora.lambdynlights.engine.lookup.SpatialLookupEntry;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Range;

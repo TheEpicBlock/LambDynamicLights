@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Range;
  *
  * @author LambdAurora
  * @version 4.0.0
+ * @see ItemLightSource
  * @since 3.0.0
  */
 public interface ItemLightSourceManager {

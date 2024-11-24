@@ -7,16 +7,17 @@
  * see the LICENSE file.
  */
 
-package dev.lambdaurora.lambdynlights.engine;
+package dev.lambdaurora.lambdynlights.engine.source;
 
+import dev.lambdaurora.lambdynlights.engine.DynamicLightingEngine;
 import dev.lambdaurora.lambdynlights.engine.lookup.SpatialLookupCollectionEntry;
 import dev.lambdaurora.lambdynlights.engine.lookup.SpatialLookupEntry;
-import dev.lambdaurora.lambdynlights.engine.source.DynamicLightSource;
 import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.bytes.ByteList;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 
@@ -24,7 +25,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-public record LightCollection(Collection<LightCollectionEntry> entries) implements DynamicLightSource {
+public class CollectionDynamicLightSource implements DynamicLightSource {
+	private boolean dirty;
+	private Collection<Entry> entries;
+
+	public CollectionDynamicLightSource(Collection<Entry> entries) {
+		this.entries = entries;
+		this.dirty = true;
+	}
+
 	public Stream<SpatialLookupEntry> splitIntoDynamicLightEntries() {
 		record Data(LongList position, ByteList luminance) {}
 		var cellKeyToData = new Int2ObjectOpenHashMap<Data>();
@@ -49,20 +58,33 @@ public record LightCollection(Collection<LightCollectionEntry> entries) implemen
 
 	@Override
 	public LongSet getDynamicLightChunksToRebuild(boolean forced) {
-		return null;
+		if (!forced && !this.dirty) {
+			return LongSet.of();
+		}
+
+		var chunks = new LongOpenHashSet();
+
+		for (var entry : this.entries) {
+			DynamicLightSource.gatherClosestChunks(chunks, entry.x, entry.y, entry.z);
+		}
+
+		return chunks;
 	}
 
-	public static LightCollection cuboid(int startX, int startY, int startZ, int endX, int endY, int endZ, int luminance) {
-		var entries = new ArrayList<LightCollectionEntry>();
+	public static CollectionDynamicLightSource cuboid(int startX, int startY, int startZ, int endX, int endY, int endZ, int luminance) {
+		var entries = new ArrayList<Entry>();
 
 		for (int x = startX; x <= endX; x++) {
 			for (int y = startY; y <= endY; y++) {
 				for (int z = startZ; z <= endZ; z++) {
-					entries.add(new LightCollectionEntry(x, y, z, luminance));
+					entries.add(new Entry(x, y, z, luminance));
 				}
 			}
 		}
 
-		return new LightCollection(entries);
+		return new CollectionDynamicLightSource(entries);
+	}
+
+	public record Entry(int x, int y, int z, int luminance) {
 	}
 }

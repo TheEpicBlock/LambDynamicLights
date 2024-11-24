@@ -51,8 +51,11 @@ public class DynamicLightsConfig {
 	private final BooleanSettingEntry entitiesLightSource;
 	private final BooleanSettingEntry selfLightSource;
 	private final BooleanSettingEntry waterSensitiveCheck;
+	private final BooleanSettingEntry beamLighting;
+	private final BooleanSettingEntry guardianLaser;
 	private final BooleanSettingEntry debugActiveDynamicLightingCells;
 	private final BooleanSettingEntry debugDisplayDynamicLightingChunkRebuild;
+	private final BooleanSettingEntry debugDisplayHandlerBoundingBox;
 	private ExplosiveLightingMode creeperLightingMode;
 	private ExplosiveLightingMode tntLightingMode;
 	private int debugCellDisplayRadius;
@@ -80,11 +83,19 @@ public class DynamicLightsConfig {
 				Text.translatable("lambdynlights.tooltip.self_light_source"))
 				.withOnSet(value -> {
 					if (!value) this.mod.removeLightSources(source ->
-							source instanceof LocalPlayer && source == Minecraft.getInstance().player
+							source instanceof LocalPlayer player && player == Minecraft.getInstance().player
 					);
 				});
 		this.waterSensitiveCheck = new BooleanSettingEntry("light_sources.water_sensitive_check", DEFAULT_WATER_SENSITIVE_CHECK, this.config,
 				Text.translatable("lambdynlights.tooltip.water_sensitive"));
+		this.beamLighting = new BooleanSettingEntry(
+				"light_sources.beam", true, this.config,
+				Text.translatable("lambdynlights.option.light_sources.beam.tooltip")
+		);
+		this.guardianLaser = new BooleanSettingEntry(
+				"light_sources.guardian_laser", true, this.config,
+				Text.translatable("lambdynlights.option.light_sources.guardian_laser.tooltip")
+		);
 		this.debugActiveDynamicLightingCells = new BooleanSettingEntry(
 				"debug.active_dynamic_lighting_cells", false, this.config,
 				Text.translatable("lambdynlights.option.debug.active_dynamic_lighting_cells.tooltip")
@@ -93,13 +104,20 @@ public class DynamicLightsConfig {
 				"debug.display_dynamic_lighting_chunk_rebuild", false, this.config,
 				Text.translatable("lambdynlights.option.debug.display_dynamic_lighting_chunk_rebuild.tooltip")
 		);
+		this.debugDisplayHandlerBoundingBox = new BooleanSettingEntry(
+				"debug.display_behavior_bounding_box", false, this.config,
+				Text.translatable("lambdynlights.option.debug.display_behavior_bounding_box.tooltip")
+		);
 
 		this.settingEntries = List.of(
 				this.entitiesLightSource,
 				this.selfLightSource,
 				this.waterSensitiveCheck,
+				this.beamLighting,
+				this.guardianLaser,
 				this.debugActiveDynamicLightingCells,
-				this.debugDisplayDynamicLightingChunkRebuild
+				this.debugDisplayDynamicLightingChunkRebuild,
+				this.debugDisplayHandlerBoundingBox
 		);
 	}
 
@@ -158,13 +176,13 @@ public class DynamicLightsConfig {
 	}
 
 	/**
-	 * Sets the dynamic lights mode.
+	 * Sets the dynamic lighting mode.
 	 *
 	 * @param mode the dynamic lights mode
 	 */
 	public void setDynamicLightsMode(@NotNull DynamicLightsMode mode) {
-		if (!mode.isEnabled()) {
-			this.mod.clearLightSources();
+		if (this.dynamicLightsMode.isEnabled() != mode.isEnabled()) {
+			this.mod.shouldForceRefresh = true;
 		}
 
 		this.dynamicLightsMode = mode;
@@ -231,6 +249,20 @@ public class DynamicLightsConfig {
 	}
 
 	/**
+	 * {@return the beacon/gateway beam light source setting holder}
+	 */
+	public BooleanSettingEntry getBeamLighting() {
+		return this.beamLighting;
+	}
+
+	/**
+	 * {@return the guardian laser light source setting holder}
+	 */
+	public BooleanSettingEntry getGuardianLaser() {
+		return this.guardianLaser;
+	}
+
+	/**
 	 * {@return the active dynamic lighting cells debug setting holder}
 	 */
 	public BooleanSettingEntry getDebugActiveDynamicLightingCells() {
@@ -250,5 +282,9 @@ public class DynamicLightsConfig {
 	 */
 	public BooleanSettingEntry getDebugDisplayDynamicLightingChunkRebuilds() {
 		return this.debugDisplayDynamicLightingChunkRebuild;
+	}
+
+	public BooleanSettingEntry getDebugDisplayHandlerBoundingBox() {
+		return this.debugDisplayHandlerBoundingBox;
 	}
 }

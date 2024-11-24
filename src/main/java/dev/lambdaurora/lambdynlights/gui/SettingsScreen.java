@@ -47,6 +47,7 @@ import java.util.stream.Collectors;
 public class SettingsScreen extends SpruceScreen {
 	private static final Background INNER_BACKGROUND = new InnerBackground();
 	private static final String DYNAMIC_LIGHT_SOURCES_KEY = "lambdynlights.menu.light_sources";
+	private static final String SPECIAL_DYNAMIC_LIGHT_SOURCES_KEY = "lambdynlights.menu.light_sources.special";
 	private static final String ADVANCED_KEY = "lambdynlights.menu.advanced";
 	private final DynamicLightsConfig config;
 	private final Screen parent;
@@ -173,7 +174,9 @@ public class SettingsScreen extends SpruceScreen {
 		list.addSingleOptionEntry(new SpruceSeparatorOption(DYNAMIC_LIGHT_SOURCES_KEY, true, null));
 		list.addOptionEntry(this.entitiesOption, this.selfOption);
 		list.addSingleOptionEntry(this.waterSensitiveOption);
+		list.addSingleOptionEntry(new SpruceSeparatorOption(SPECIAL_DYNAMIC_LIGHT_SOURCES_KEY, true, null));
 		list.addOptionEntry(this.creeperLightingOption, this.tntLightingOption);
+		list.addOptionEntry(this.config.getBeamLighting().getOption(), this.config.getGuardianLaser().getOption());
 		context.addInnerWidget(list);
 	}
 
@@ -182,6 +185,7 @@ public class SettingsScreen extends SpruceScreen {
 		list.addSingleOptionEntry(this.config.getDebugActiveDynamicLightingCells().getOption());
 		list.addSingleOptionEntry(this.debugCellDisplayRadiusOption);
 		list.addSingleOptionEntry(this.config.getDebugDisplayDynamicLightingChunkRebuilds().getOption());
+		list.addSingleOptionEntry(this.config.getDebugDisplayHandlerBoundingBox().getOption());
 		context.addInnerWidget(list);
 	}
 
