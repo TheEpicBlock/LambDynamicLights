@@ -11,4 +11,4 @@ pluginManagement {
 }
 
 includeBuild("build_logic")
-include("api")
+include("api", "api:moj_xplat")

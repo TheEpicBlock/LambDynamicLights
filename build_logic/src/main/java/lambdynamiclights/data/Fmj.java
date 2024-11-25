@@ -11,10 +11,6 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public final class Fmj extends ModBase<Fmj> {
-	private final String version;
-	private final List<String> authors = new ArrayList<>();
-	private Contact contact;
-	private String license;
 	private String environment;
 	private final Map<String, List<String>> entrypoints = new LinkedHashMap<>();
 	private String accessWidener;
@@ -25,32 +21,7 @@ public final class Fmj extends ModBase<Fmj> {
 	private final Map<String, Object> custom = new LinkedHashMap<>();
 
 	public Fmj(String namespace, String name, String version) {
-		super(namespace, name);
-		this.version = version;
-	}
-
-	public Fmj withAuthors(List<String> authors) {
-		this.authors.addAll(authors);
-		return this;
-	}
-
-	public Fmj withAuthors(String... authors) {
-		return this.withAuthors(Arrays.asList(authors));
-	}
-
-	private Contact useContact() {
-		if (this.contact == null) this.contact = new Contact();
-		return this.contact;
-	}
-
-	public Fmj withContact(Consumer<Contact> action) {
-		action.accept(this.useContact());
-		return this;
-	}
-
-	public Fmj withLicense(String license) {
-		this.license = license;
-		return this;
+		super(namespace, name, version);
 	}
 
 	public Fmj withEnvironment(String environment) {
@@ -98,27 +69,6 @@ public final class Fmj extends ModBase<Fmj> {
 		return this;
 	}
 
-	public static final class Contact implements Serializable {
-		private String homepage;
-		private String sources;
-		private String issues;
-
-		public Contact withHomepage(String homepage) {
-			this.homepage = homepage;
-			return this;
-		}
-
-		public Contact withSources(String sources) {
-			this.sources = sources;
-			return this;
-		}
-
-		public Contact withIssues(String issues) {
-			this.issues = issues;
-			return this;
-		}
-	}
-
 	public static final class ModMenu implements Serializable {
 		private Map<String, String> links;
 		private List<String> badges;
@@ -155,7 +105,7 @@ public final class Fmj extends ModBase<Fmj> {
 			return this.withParent(mod);
 		}
 
-		public static final class ParentMod extends ModBase<ParentMod> {
+		public static final class ParentMod extends ModShell<ParentMod> {
 			private List<String> badges;
 
 			public ParentMod(String namespace, String name) {
