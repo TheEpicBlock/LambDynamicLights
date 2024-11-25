@@ -30,15 +30,20 @@ Searching other mods to replace OptiFine? [Check out this list!](https://optifin
 ## ✅ Features:
 
 - Dynamic lighting.
-- Settings to select how smooth the dynamic lighting is.
-- Works with some modded items.
+- Settings to select how smoothly the dynamic lighting updates.
 - Any entity holding an item which emits light will emit light!
-- Magma cubes emit light.
-- Spectral arrows emit light.
+  - Item lighting can be customized through resource-packs and can work with modded items!
+  - Some items like torches, soul torches, etc. will not light up in water.
+- Various entities will naturally emit light, like:
+  - Allays
+  - Blazes
+  - Fireballs
+  - Glow squids
+  - Magma cubes
+  - Spectral arrows
 - Burning entities emit light.
-- Blazes emit light.
-- Some items like torches, soul torches, etc. will not light up in water.
 - Quick and simple API for developers and resource pack makers.
+  - Check out [the documentation][documentation] for more details!
 - And more!
 
 ## Screenshots
@@ -101,7 +106,7 @@ Need help? Come check out [my Discord server][LambdAurora Discord].
 
 ## 📖 Is there an API? How to use it as a developer?
 
-[Check out this in-depth documentation](https://lambdaurora.dev/projects/lambdynamiclights/docs/v4/).
+[Check out this in-depth documentation][documentation].
 
 ## 📖 How does it work internally?
 
@@ -147,4 +152,5 @@ GitHub
 [Fabric API]: https://www.curseforge.com/minecraft/mc-mods/fabric-api "Fabric API CurseForge page"
 [ModMenu]: https://modrinth.com/mod/modmenu
 [Sodium]: https://www.curseforge.com/minecraft/mc-mods/sodium "Sodium CurseForge page"
+[documentation]: https://lambdaurora.dev/projects/lambdynamiclights/docs/v4/ "The documentation page of LambDynamicLights"
 [LambdAurora Discord]: https://discord.lambdaurora.dev
