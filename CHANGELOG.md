@@ -212,6 +212,10 @@
 - Fixed dynamic lighting of various projectiles.
 - Fixed water-sensitive items lighting up underwater while they shouldn't.
 
+### 3.1.3
+
+- Fixed item frames and other "block-attached" entities not ticking properly on the integrated server.
+
 ## 3.2.0
 
 - Updated to Minecraft 1.21.2.
@@ -231,6 +235,11 @@
 - Same changes as v3.1.2 but for 1.21.3.
 - Fixed dynamic lighting of various projectiles.
 - Fixed water-sensitive items lighting up underwater while they shouldn't.
+
+### 3.2.3
+
+- Same changes as v3.1.3 but for 1.21.3.
+- Fixed item frames and other "block-attached" entities not ticking properly on the integrated server.
 
 ## 4.0.0
 
