@@ -13,6 +13,7 @@ import com.mojang.blaze3d.vertex.MatrixStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.lambdaurora.lambdynlights.DynamicLightsConfig;
 import dev.lambdaurora.lambdynlights.LambDynLights;
+import dev.lambdaurora.spruceui.util.ColorUtil;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import net.fabricmc.api.EnvType;
@@ -80,7 +81,12 @@ public abstract class DynamicLightDebugRenderer implements DebugRenderer.SimpleD
 			int realEndCellY = endCellY + origin.getY();
 			int realEndCellZ = endCellZ + origin.getZ();
 			VertexConsumer vertexConsumer = multiBufferSource.getBuffer(RenderType.debugLineStrip(1.0));
-			renderEdge(matrices, vertexConsumer, x, y, z, cellSize, realStartCellX, realStartCellY, realStartCellZ, realEndCellX, realEndCellY, realEndCellZ, color);
+			renderEdge(
+					matrices, vertexConsumer, x, y, z, cellSize,
+					realStartCellX, realStartCellY, realStartCellZ,
+					realEndCellX, realEndCellY, realEndCellZ,
+					color
+			);
 		}, true);
 	}
 
@@ -97,7 +103,10 @@ public abstract class DynamicLightDebugRenderer implements DebugRenderer.SimpleD
 				matrices, vertexConsumer, direction,
 				faceX, faceY, faceZ,
 				faceX + cellSize, faceY + cellSize, faceZ + cellSize,
-				((color >> 16) & 0xff) / 255.f, ((color >> 8) & 0xff) / 255.f, (color & 0xff) / 255.f, ((color >> 24) & 0xff) / 255.f
+				ColorUtil.floatColor(ColorUtil.argbUnpackRed(color)),
+				ColorUtil.floatColor(ColorUtil.argbUnpackGreen(color)),
+				ColorUtil.floatColor(ColorUtil.argbUnpackBlue(color)),
+				ColorUtil.floatColor(ColorUtil.argbUnpackAlpha(color))
 		);
 	}
 
@@ -150,9 +159,9 @@ public abstract class DynamicLightDebugRenderer implements DebugRenderer.SimpleD
 			for (var entry : this.chunks.long2IntEntrySet()) {
 				var chunk = ChunkSectionPos.of(entry.getLongKey());
 
-				float red = ((COLOR >> 16) & 0xff) / 255.f;
-				float green = ((COLOR >> 8) & 0xff) / 255.f;
-				float blue = (COLOR & 0xff) / 255.f;
+				float red = ColorUtil.floatColor(ColorUtil.argbUnpackRed(COLOR));
+				float green = ColorUtil.floatColor(ColorUtil.argbUnpackGreen(COLOR));
+				float blue = ColorUtil.floatColor(ColorUtil.argbUnpackBlue(COLOR));
 				float alpha = entry.getIntValue() / 4.f;
 
 				ShapeRenderer.renderLineBox(
