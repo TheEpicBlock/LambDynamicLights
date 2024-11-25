@@ -40,7 +40,7 @@ apiProject.artifacts.add("mojmapRuntimeElements", tasks.remapJar) {
 	classifier = "mojmap"
 }
 
-val remapMojmapSourcesTask = tasks.register("remapMojmapSourcesJar", RemapSourcesJarTask::class) {
+tasks.remapSourcesJar {
 	val remapJar = apiProject.tasks.named("remapSourcesJar", RemapSourcesJarTask::class)
 	dependsOn(remapJar)
 
@@ -55,6 +55,6 @@ val remapMojmapSourcesTask = tasks.register("remapMojmapSourcesJar", RemapSource
 apiProject.configurations["mojmapSourcesElements"].artifacts.removeIf {
 	true
 }
-apiProject.artifacts.add("mojmapSourcesElements", remapMojmapSourcesTask) {
+apiProject.artifacts.add("mojmapSourcesElements", tasks.remapSourcesJar) {
 	classifier = "mojmap-sources"
 }

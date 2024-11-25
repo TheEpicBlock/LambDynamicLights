@@ -1,19 +1,19 @@
 package lambdynamiclights.data;
 
-import com.google.gson.annotations.SerializedName;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
 
-import java.io.Serializable;
+public class ModBase<SELF extends ModBase<SELF>> extends ModShell<SELF> {
+	protected final String version;
+	protected final List<String> authors = new ArrayList<>();
+	protected Contact contact;
+	protected String license;
 
-public class ModBase<SELF extends ModBase<SELF>> implements Serializable {
-	@SerializedName("id")
-	protected String namespace;
-	protected String name;
-	protected String description;
-	protected String icon;
-
-	public ModBase(String namespace, String name) {
-		this.namespace = namespace;
-		this.name = name;
+	public ModBase(String namespace, String name, String version) {
+		super(namespace, name);
+		this.version = version;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -21,23 +21,40 @@ public class ModBase<SELF extends ModBase<SELF>> implements Serializable {
 		return (SELF) this;
 	}
 
-	public SELF withNamespace(String namespace) {
-		this.namespace = namespace;
+	public SELF withAuthors(List<String> authors) {
+		this.authors.addAll(authors);
 		return this.$self();
 	}
 
-	public SELF withName(String name) {
-		this.name = name;
+	public SELF withAuthors(String... authors) {
+		return this.withAuthors(Arrays.asList(authors));
+	}
+
+	private Contact useContact() {
+		if (this.contact == null) this.contact = new Contact();
+		return this.contact;
+	}
+
+	public SELF withContact(Consumer<Contact> action) {
+		action.accept(this.useContact());
 		return this.$self();
 	}
 
-	public SELF withDescription(String description) {
-		this.description = description;
+	public SELF withLicense(String license) {
+		this.license = license;
 		return this.$self();
 	}
 
-	public SELF withIcon(String icon) {
-		this.icon = icon;
-		return this.$self();
+	public <VARIANT extends ModBase<VARIANT>> VARIANT derive(ModBaseFactory<VARIANT> factory) {
+		var variant = factory.create(this.namespace, this.name, this.version);
+		this.copyTo(variant);
+		variant.authors.addAll(this.authors);
+		variant.contact = this.contact != null ? this.contact.copy() : null;
+		variant.license = this.license;
+		return variant;
+	}
+
+	public interface ModBaseFactory<SELF extends ModBase<SELF>> {
+		SELF create(String namespace, String name, String version);
 	}
 }
