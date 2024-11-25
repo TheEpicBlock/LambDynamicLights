@@ -47,35 +47,43 @@ Searching other mods to replace OptiFine? [Check out this list!](https://optifin
 
 Dropped items which already emit light as a block, will also dynamically emit light!
 
-![Torch](assets/torch.png)
+![Dropped lantern](assets/lantern_study.png)
 
 ### Held items emit light
 
 Light is emitted when entities hold light emitting items.
 
-![Fox holding lantern](assets/fox_holding_lantern.png)
+![Torch](assets/torch.png)
+![Fox holding glowberries](assets/fox_holding.png)
 
 ### Fire! Fire! Fire!
 
 Any entity on fire will emit light!
 
-![Skeleton on fire!](assets/fire_skeleton.png)
+![An Aurora is on fire!](assets/fire.png)
+![Arrow on fire!](assets/fire_arrow.png)
 
-### Spectral arrows
+### Explosion imminent!
 
-Spectral arrows will emit a very weak light!
+Creepers can make their imminent explosions more apparent through a progressive emission of light!
 
-![Spectral arrows](assets/spectral_arrow.png)
+![Quick! Need to protect myself from this Creeper!](assets/creeper.png)
 
-### Different luminance!
+### Glow Squids!
 
-Light emitted from items depend on the light emitted from their respective blocks!
+The infamous glow squids finally glow in your world!
 
-![light levels](assets/light_levels.png)
+![A group of glow squids](assets/glow_squid.png)
+
+### Guardian Lasers!
+
+Wait... what? **Lasers?!** They do pack a punch...
+
+![light levels](assets/guardian_laser.png)
 
 ### Configuration GUI
 
-As of v2.1.0.
+As of v4.0.0.
 
 ![Configuration GUI](assets/settings_main.png)
 ![Entities Configuration](assets/settings_entities.png)
@@ -91,19 +99,19 @@ You can also configure the mod by editing the file in `config/lambdynlights.toml
 
 Need help? Come check out [my Discord server][LambdAurora Discord].
 
+## 📖 Is there an API? How to use it as a developer?
+
+[Check out this in-depth documentation](https://lambdaurora.dev/projects/lambdynamiclights/docs/v4/).
+
+## 📖 How does it work internally?
+
+[Check out this document I've written on the fundamentals of it](https://github.com/LambdAurora/LambDynamicLights/blob/1.21/HOW_DOES_IT_WORK.md).
+
 <!-- modrinth_exclude.start -->
 ### Build
 
 Just do `./gradlew build` and everything should build just fine!
 <!-- modrinth_exclude.end -->
-
-## 📖 How does it work internally?
-
-Check [this documentation](https://github.com/LambdAurora/LambDynamicLights/blob/1.21/HOW_DOES_IT_WORK.md).
-
-## 📖 Is there an API? How to use it as a developer?
-
-Check [this documentation](https://lambdaurora.dev/projects/lambdynamiclights/docs/v4/).
 
 <!-- modrinth_exclude.long_start -->
 ## Downloads
