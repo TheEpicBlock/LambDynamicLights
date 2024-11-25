@@ -49,7 +49,7 @@ public final class Nmt extends ModBase<Nmt> {
 
 			if (this.icon != null) {
 				builder.property("logoFile", this.icon);
-				builder.property("logoBlur", false);
+				builder.property("logoBlur", true);
 			}
 
 			if (this.contact != null) {

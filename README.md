@@ -47,38 +47,38 @@ Searching other mods to replace OptiFine? [Check out this list!](https://optifin
 
 Dropped items which already emit light as a block, will also dynamically emit light!
 
-![Torch](images/torch.png)
+![Torch](assets/torch.png)
 
 ### Held items emit light
 
 Light is emitted when entities hold light emitting items.
 
-![Fox holding lantern](images/fox_holding_lantern.png)
+![Fox holding lantern](assets/fox_holding_lantern.png)
 
 ### Fire! Fire! Fire!
 
 Any entity on fire will emit light!
 
-![Skeleton on fire!](images/fire_skeleton.png)
+![Skeleton on fire!](assets/fire_skeleton.png)
 
 ### Spectral arrows
 
 Spectral arrows will emit a very weak light!
 
-![Spectral arrows](images/spectral_arrow.png)
+![Spectral arrows](assets/spectral_arrow.png)
 
 ### Different luminance!
 
 Light emitted from items depend on the light emitted from their respective blocks!
 
-![light levels](images/light_levels.png)
+![light levels](assets/light_levels.png)
 
 ### Configuration GUI
 
 As of v2.1.0.
 
-![Configuration GUI](images/settings_main.png)
-![Entities Configuration](images/settings_entities.png)
+![Configuration GUI](assets/settings_main.png)
+![Entities Configuration](assets/settings_entities.png)
 
 ## 📖 Usage
 

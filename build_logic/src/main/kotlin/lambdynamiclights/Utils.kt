@@ -4,7 +4,7 @@ import org.gradle.api.Project
 
 object Utils {
 	fun parseReadme(project: Project): String {
-		val linkRegex = "!\\[([A-z_ ]+)]\\((images\\/[A-z.\\/_]+)\\)"
+		val linkRegex = "!\\[([A-z_ ]+)]\\((assets\\/[A-z.\\/_]+)\\)"
 
 		var readme = project.rootProject.file("README.md").readText()
 		val lines = readme.split("\n").toMutableList()
@@ -28,7 +28,7 @@ object Utils {
 		}
 
 		readme = lines.joinToString("\n")
-		readme = readme.replace(linkRegex.toRegex(), "![\$1](https://raw.githubusercontent.com/LambdAurora/LambDynamicLights/1.21.2/\$2)")
+		readme = readme.replace(linkRegex.toRegex(), "![\$1](https://raw.githubusercontent.com/LambdAurora/LambDynamicLights/1.21.4/\$2)")
 		return readme
 	}
 
