@@ -9,6 +9,8 @@
 
 package dev.lambdaurora.lambdynlights.api.behavior;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represents the dynamic lighting behavior manager,
  * which provides the ability to add and remove custom dynamic lighting sources.
@@ -24,7 +26,7 @@ public interface DynamicLightBehaviorManager {
 	 *
 	 * @param source the source to add
 	 */
-	void add(DynamicLightBehavior source);
+	void add(@NotNull DynamicLightBehavior source);
 
 	/**
 	 * Removes the given dynamic lighting source from the client world.

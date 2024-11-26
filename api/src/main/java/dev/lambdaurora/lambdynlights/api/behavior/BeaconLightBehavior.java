@@ -23,6 +23,9 @@ import java.util.OptionalInt;
  * @param z the Z-coordinate of the beam
  * @param luminance the luminance of the beam
  * @param level the world in which the beam is in
+ * @author LambdAurora, Akarys
+ * @version 4.0.0
+ * @since 4.0.0
  */
 public record BeaconLightBehavior(int x, OptionalInt y, int z, @Range(from = 0, to = 15) int luminance, Level level) implements DynamicLightBehavior {
 	public BeaconLightBehavior(int x, int z, @Range(from = 0, to = 15) int luminance, Level level) {

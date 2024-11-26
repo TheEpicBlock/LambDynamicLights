@@ -13,6 +13,7 @@ import dev.lambdaurora.lambdynlights.LambDynLights;
 import dev.lambdaurora.lambdynlights.api.behavior.DynamicLightBehavior;
 import dev.lambdaurora.lambdynlights.api.behavior.DynamicLightBehaviorManager;
 import dev.lambdaurora.lambdynlights.engine.source.DeferredDynamicLightSource;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents the dynamic lighting behavior manager implementation.
@@ -29,7 +30,7 @@ public final class DynamicLightBehaviorSources implements DynamicLightBehaviorMa
 	}
 
 	@Override
-	public void add(DynamicLightBehavior source) {
+	public void add(@NotNull DynamicLightBehavior source) {
 		this.mod.addLightSource(new DeferredDynamicLightSource(source));
 	}
 

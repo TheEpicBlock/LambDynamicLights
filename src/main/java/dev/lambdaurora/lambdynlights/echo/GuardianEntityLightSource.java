@@ -15,6 +15,13 @@ import dev.lambdaurora.lambdynlights.engine.DynamicLightingEngine;
 import net.minecraft.world.entity.monster.Guardian;
 import org.joml.Vector3d;
 
+/**
+ * Represents a Guardian laser light source.
+ *
+ * @author LambdAurora
+ * @version 4.0.0
+ * @since 4.0.0
+ */
 public interface GuardianEntityLightSource {
 	LineLightBehavior lambdynlights$getDynamicLightBeam();
 

@@ -9,7 +9,6 @@
 
 package dev.lambdaurora.lambdynlights.echo;
 
-import dev.lambdaurora.lambdynlights.LambDynLights;
 import dev.lambdaurora.lambdynlights.api.behavior.DynamicLightBehavior;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.TheEndGatewayBlockEntity;
@@ -19,7 +18,11 @@ import org.jetbrains.annotations.Range;
 /**
  * Represents an end gateway beam dynamic lighting behavior.
  *
+ * @param gateway the End gateway block entity
  * @param level the world in which the beam is in
+ * @author LambdAurora
+ * @version 4.0.0
+ * @since 4.0.0
  */
 public record TheEndGatewayBeamLightBehavior(TheEndGatewayBlockEntity gateway, Level level) implements DynamicLightBehavior {
 	private int getWorldBottom() {
