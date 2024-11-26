@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Range;
 import java.util.List;
 
 /**
- * Represents the luminance value of a display entity.
+ * Provides the luminance value of a display entity.
  *
  * @author LambdAurora
  * @version 4.0.0
@@ -52,7 +52,7 @@ public record DisplayEntityLuminance(List<EntityLuminance> luminance) implements
 	}
 
 	/**
-	 * Represents the luminance value of a block display entity.
+	 * Provides the luminance value of a block display entity.
 	 */
 	public static final class BlockDisplayLuminance implements EntityLuminance {
 		public static final BlockDisplayLuminance INSTANCE = new BlockDisplayLuminance();
@@ -73,7 +73,7 @@ public record DisplayEntityLuminance(List<EntityLuminance> luminance) implements
 	}
 
 	/**
-	 * Represents the luminance value of an item display entity.
+	 * Provides the luminance value of an item display entity.
 	 */
 	public static final class ItemDisplayLuminance implements EntityLuminance {
 		public static final ItemDisplayLuminance INSTANCE = new ItemDisplayLuminance();

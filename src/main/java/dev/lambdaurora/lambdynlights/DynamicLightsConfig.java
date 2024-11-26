@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * Represents the mod configuration.
@@ -37,20 +38,27 @@ public class DynamicLightsConfig {
 	private static final DynamicLightsMode DEFAULT_DYNAMIC_LIGHTS_MODE = DynamicLightsMode.FANCY;
 	private static final boolean DEFAULT_ENTITIES_LIGHT_SOURCE = true;
 	private static final boolean DEFAULT_SELF_LIGHT_SOURCE = true;
-	private static final boolean DEFAULT_BLOCK_ENTITIES_LIGHT_SOURCE = true;
 	private static final boolean DEFAULT_WATER_SENSITIVE_CHECK = true;
 	private static final ExplosiveLightingMode DEFAULT_CREEPER_LIGHTING_MODE = ExplosiveLightingMode.SIMPLE;
 	private static final ExplosiveLightingMode DEFAULT_TNT_LIGHTING_MODE = ExplosiveLightingMode.OFF;
+	private static final int DEFAULT_DEBUG_CELL_DISPLAY_RADIUS = 0;
 
 	public static final Path CONFIG_FILE_PATH = FabricLoader.getInstance().getConfigDir().resolve("lambdynlights.toml");
 	protected final FileConfig config;
 	private final LambDynLights mod;
 	private DynamicLightsMode dynamicLightsMode;
+	private final List<SettingEntry<?>> settingEntries;
 	private final BooleanSettingEntry entitiesLightSource;
 	private final BooleanSettingEntry selfLightSource;
 	private final BooleanSettingEntry waterSensitiveCheck;
+	private final BooleanSettingEntry beamLighting;
+	private final BooleanSettingEntry guardianLaser;
+	private final BooleanSettingEntry debugActiveDynamicLightingCells;
+	private final BooleanSettingEntry debugDisplayDynamicLightingChunkRebuild;
+	private final BooleanSettingEntry debugDisplayHandlerBoundingBox;
 	private ExplosiveLightingMode creeperLightingMode;
 	private ExplosiveLightingMode tntLightingMode;
+	private int debugCellDisplayRadius;
 
 	public final SpruceOption dynamicLightsModeOption = new SpruceCyclingOption("lambdynlights.option.mode",
 			amount -> this.setDynamicLightsMode(this.dynamicLightsMode.next()),
@@ -70,19 +78,47 @@ public class DynamicLightsConfig {
 				.writingMode(WritingMode.REPLACE_ATOMIC)
 				.build();
 		this.entitiesLightSource = new BooleanSettingEntry("light_sources.entities", DEFAULT_ENTITIES_LIGHT_SOURCE, this.config,
-				Text.translatable("lambdynlights.tooltip.entities"))
-				.withOnSet(value -> {
-					if (!value) this.mod.removeEntitiesLightSource();
-				});
+				Text.translatable("lambdynlights.tooltip.entities"));
 		this.selfLightSource = new BooleanSettingEntry("light_sources.self", DEFAULT_SELF_LIGHT_SOURCE, this.config,
 				Text.translatable("lambdynlights.tooltip.self_light_source"))
 				.withOnSet(value -> {
 					if (!value) this.mod.removeLightSources(source ->
-							source instanceof LocalPlayer && source == Minecraft.getInstance().player
+							source instanceof LocalPlayer player && player == Minecraft.getInstance().player
 					);
 				});
 		this.waterSensitiveCheck = new BooleanSettingEntry("light_sources.water_sensitive_check", DEFAULT_WATER_SENSITIVE_CHECK, this.config,
 				Text.translatable("lambdynlights.tooltip.water_sensitive"));
+		this.beamLighting = new BooleanSettingEntry(
+				"light_sources.beam", true, this.config,
+				Text.translatable("lambdynlights.option.light_sources.beam.tooltip")
+		);
+		this.guardianLaser = new BooleanSettingEntry(
+				"light_sources.guardian_laser", true, this.config,
+				Text.translatable("lambdynlights.option.light_sources.guardian_laser.tooltip")
+		);
+		this.debugActiveDynamicLightingCells = new BooleanSettingEntry(
+				"debug.active_dynamic_lighting_cells", false, this.config,
+				Text.translatable("lambdynlights.option.debug.active_dynamic_lighting_cells.tooltip")
+		);
+		this.debugDisplayDynamicLightingChunkRebuild = new BooleanSettingEntry(
+				"debug.display_dynamic_lighting_chunk_rebuild", false, this.config,
+				Text.translatable("lambdynlights.option.debug.display_dynamic_lighting_chunk_rebuild.tooltip")
+		);
+		this.debugDisplayHandlerBoundingBox = new BooleanSettingEntry(
+				"debug.display_behavior_bounding_box", false, this.config,
+				Text.translatable("lambdynlights.option.debug.display_behavior_bounding_box.tooltip")
+		);
+
+		this.settingEntries = List.of(
+				this.entitiesLightSource,
+				this.selfLightSource,
+				this.waterSensitiveCheck,
+				this.beamLighting,
+				this.guardianLaser,
+				this.debugActiveDynamicLightingCells,
+				this.debugDisplayDynamicLightingChunkRebuild,
+				this.debugDisplayHandlerBoundingBox
+		);
 	}
 
 	/**
@@ -94,13 +130,12 @@ public class DynamicLightsConfig {
 		String dynamicLightsModeValue = this.config.getOrElse("mode", DEFAULT_DYNAMIC_LIGHTS_MODE.getName());
 		this.dynamicLightsMode = DynamicLightsMode.byId(dynamicLightsModeValue)
 				.orElse(DEFAULT_DYNAMIC_LIGHTS_MODE);
-		this.entitiesLightSource.load(this.config);
-		this.selfLightSource.load(this.config);
-		this.waterSensitiveCheck.load(this.config);
+		this.settingEntries.forEach(entry -> entry.load(this.config));
 		this.creeperLightingMode = ExplosiveLightingMode.byId(this.config.getOrElse("light_sources.creeper", DEFAULT_CREEPER_LIGHTING_MODE.getName()))
 				.orElse(DEFAULT_CREEPER_LIGHTING_MODE);
 		this.tntLightingMode = ExplosiveLightingMode.byId(this.config.getOrElse("light_sources.tnt", DEFAULT_TNT_LIGHTING_MODE.getName()))
 				.orElse(DEFAULT_TNT_LIGHTING_MODE);
+		this.debugCellDisplayRadius = this.config.getOrElse("debug.cell_display_radius", DEFAULT_DEBUG_CELL_DISPLAY_RADIUS);
 
 		LambDynLights.log(LOGGER, "Configuration loaded.");
 	}
@@ -126,9 +161,7 @@ public class DynamicLightsConfig {
 	 */
 	public void reset() {
 		this.setDynamicLightsMode(DEFAULT_DYNAMIC_LIGHTS_MODE);
-		this.getEntitiesLightSource().set(DEFAULT_ENTITIES_LIGHT_SOURCE);
-		this.getSelfLightSource().set(DEFAULT_SELF_LIGHT_SOURCE);
-		this.getWaterSensitiveCheck().set(DEFAULT_WATER_SENSITIVE_CHECK);
+		this.settingEntries.forEach(SettingEntry::reset);
 		this.setCreeperLightingMode(DEFAULT_CREEPER_LIGHTING_MODE);
 		this.setTntLightingMode(DEFAULT_TNT_LIGHTING_MODE);
 	}
@@ -143,13 +176,13 @@ public class DynamicLightsConfig {
 	}
 
 	/**
-	 * Sets the dynamic lights mode.
+	 * Sets the dynamic lighting mode.
 	 *
 	 * @param mode the dynamic lights mode
 	 */
 	public void setDynamicLightsMode(@NotNull DynamicLightsMode mode) {
-		if (!mode.isEnabled()) {
-			this.mod.clearLightSources();
+		if (this.dynamicLightsMode.isEnabled() != mode.isEnabled()) {
+			this.mod.shouldForceRefresh = true;
 		}
 
 		this.dynamicLightsMode = mode;
@@ -212,9 +245,46 @@ public class DynamicLightsConfig {
 	 */
 	public void setTntLightingMode(@NotNull ExplosiveLightingMode lightingMode) {
 		this.tntLightingMode = lightingMode;
-
-		if (!lightingMode.isEnabled())
-			this.mod.removeTntLightSources();
 		this.config.set("light_sources.tnt", lightingMode.getName());
+	}
+
+	/**
+	 * {@return the beacon/gateway beam light source setting holder}
+	 */
+	public BooleanSettingEntry getBeamLighting() {
+		return this.beamLighting;
+	}
+
+	/**
+	 * {@return the guardian laser light source setting holder}
+	 */
+	public BooleanSettingEntry getGuardianLaser() {
+		return this.guardianLaser;
+	}
+
+	/**
+	 * {@return the active dynamic lighting cells debug setting holder}
+	 */
+	public BooleanSettingEntry getDebugActiveDynamicLightingCells() {
+		return this.debugActiveDynamicLightingCells;
+	}
+
+	public int getDebugCellDisplayRadius() {
+		return this.debugCellDisplayRadius;
+	}
+
+	public void setDebugCellDisplayRadius(int debugCellDisplayRadius) {
+		this.debugCellDisplayRadius = debugCellDisplayRadius;
+	}
+
+	/**
+	 * {@return the dynamic lighting chunk rebuilds display debug setting holder}
+	 */
+	public BooleanSettingEntry getDebugDisplayDynamicLightingChunkRebuilds() {
+		return this.debugDisplayDynamicLightingChunkRebuild;
+	}
+
+	public BooleanSettingEntry getDebugDisplayHandlerBoundingBox() {
+		return this.debugDisplayHandlerBoundingBox;
 	}
 }

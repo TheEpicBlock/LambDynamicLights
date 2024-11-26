@@ -9,7 +9,7 @@
 
 package dev.lambdaurora.lambdynlights.mixin.lightsource;
 
-import dev.lambdaurora.lambdynlights.engine.DynamicLightSource;
+import dev.lambdaurora.lambdynlights.engine.source.EntityDynamicLightSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(Player.class)
-public abstract class PlayerEntityMixin extends LivingEntityMixin implements DynamicLightSource {
+public abstract class PlayerEntityMixin extends LivingEntityMixin implements EntityDynamicLightSource {
 	@Shadow
 	public abstract boolean isSpectator();
 

@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 /**
- * Represents the luminance value of an item entity.
+ * Provides the luminance value of an item entity.
  *
  * @author LambdAurora
  * @version 4.0.0

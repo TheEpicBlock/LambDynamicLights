@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 /**
- * Represents the luminance value derived from a falling block's luminance.
+ * Provides the luminance value derived from a falling block's luminance.
  *
  * @author LambdAurora
  * @version 4.0.0

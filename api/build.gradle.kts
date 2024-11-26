@@ -1,4 +1,6 @@
 import lambdynamiclights.Constants
+import lambdynamiclights.data.Nmt
+import lambdynamiclights.task.GenerateNmtTask
 
 plugins {
 	id("lambdynamiclights")
@@ -20,6 +22,43 @@ tasks.generateFmj.configure {
 						.withIcon("assets/${Constants.NAMESPACE}/icon.png")
 				}
 		}
+}
+
+val generateNmt = tasks.register("generateNmt", GenerateNmtTask::class) {
+	this.nmt.set(tasks.generateFmj.flatMap {
+		it.fmj.map { fmj ->
+			fmj.derive(::Nmt)
+				.withLoaderVersion("[2,)")
+				.withDepend("minecraft", "[" + libs.versions.minecraft.get() + ",)")
+		}
+	})
+	outputDir.set(project.file("build/generated/generated_resources/"))
+}
+
+tasks.generateFmj.configure {
+	dependsOn(generateNmt)
+}
+
+tasks.ideaSyncTask.configure {
+	dependsOn(generateNmt)
+}
+
+tasks.getByName("sourcesJar") {
+	dependsOn(generateNmt)
+}
+
+val mojmap by sourceSets.creating {}
+
+java {
+	registerFeature("mojmap") {
+		usingSourceSet(mojmap)
+		withSourcesJar()
+
+		afterEvaluate {
+			configurations["mojmapApiElements"].extendsFrom(configurations["apiElements"])
+			configurations["mojmapRuntimeElements"].extendsFrom(configurations["runtimeElements"])
+		}
+	}
 }
 
 // Configure the maven publication.

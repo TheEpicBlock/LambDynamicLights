@@ -10,7 +10,7 @@
 package dev.lambdaurora.lambdynlights.mixin;
 
 import dev.lambdaurora.lambdynlights.LambDynLights;
-import dev.lambdaurora.lambdynlights.engine.DynamicLightSource;
+import dev.lambdaurora.lambdynlights.engine.source.EntityDynamicLightSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
@@ -27,7 +27,7 @@ public class EntityRendererMixin<T extends Entity> {
 			return; // Do not touch to the value.
 
 		int vanilla = cir.getReturnValueI();
-		int entityLuminance = ((DynamicLightSource) entity).getLuminance();
+		int entityLuminance = ((EntityDynamicLightSource) entity).getLuminance();
 		if (entityLuminance >= 15)
 			cir.setReturnValue(entityLuminance);
 

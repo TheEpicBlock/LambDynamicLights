@@ -10,8 +10,8 @@
 package dev.lambdaurora.lambdynlights.mixin.lightsource;
 
 import dev.lambdaurora.lambdynlights.LambDynLights;
-import dev.lambdaurora.lambdynlights.engine.DynamicLightSourceBehavior;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import dev.lambdaurora.lambdynlights.engine.source.EntityDynamicLightSourceBehavior;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin implements DynamicLightSourceBehavior {
+public abstract class EntityMixin implements EntityDynamicLightSourceBehavior {
 	@Shadow
 	public abstract Level level();
 
@@ -60,7 +60,7 @@ public abstract class EntityMixin implements DynamicLightSourceBehavior {
 	@Unique
 	private double lambdynlights$prevZ;
 	@Unique
-	private LongOpenHashSet lambdynlights$trackedLitChunkPos = new LongOpenHashSet();
+	private LongSet lambdynlights$trackedLitChunkPos = LongSet.of();
 
 	@Inject(method = "remove", at = @At("TAIL"))
 	public void onRemove(CallbackInfo ci) {
@@ -105,9 +105,9 @@ public abstract class EntityMixin implements DynamicLightSourceBehavior {
 
 	@Override
 	public void updateDynamicLightPreviousCoordinates() {
-		this.lambdynlights$prevX = this.getX();
-		this.lambdynlights$prevY = this.getY();
-		this.lambdynlights$prevZ = this.getZ();
+		this.lambdynlights$prevX = this.getDynamicLightX();
+		this.lambdynlights$prevY = this.getDynamicLightY();
+		this.lambdynlights$prevZ = this.getDynamicLightZ();
 	}
 
 	@Override
@@ -165,12 +165,12 @@ public abstract class EntityMixin implements DynamicLightSourceBehavior {
 	}
 
 	@Override
-	public LongOpenHashSet lambdynlights$getTrackedLitChunkPos() {
+	public LongSet lambdynlights$getTrackedLitChunkPos() {
 		return this.lambdynlights$trackedLitChunkPos;
 	}
 
 	@Override
-	public void lambdynlights$setTrackedLitChunkPos(LongOpenHashSet trackedLitChunkPos) {
+	public void lambdynlights$setTrackedLitChunkPos(LongSet trackedLitChunkPos) {
 		this.lambdynlights$trackedLitChunkPos = trackedLitChunkPos;
 	}
 }

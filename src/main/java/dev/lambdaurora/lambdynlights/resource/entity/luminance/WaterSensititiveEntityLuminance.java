@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Range;
 import java.util.List;
 
 /**
- * Represents a conditional luminance value depending on whether the entity is in or out of water.
+ * Provides a conditional luminance value depending on whether the entity is in or out of water.
  *
  * @param outOfWater the luminance values if the entity is out of water
  * @param inWater the luminance values if the entity is in water

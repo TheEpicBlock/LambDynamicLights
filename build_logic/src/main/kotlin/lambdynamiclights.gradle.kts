@@ -30,7 +30,7 @@ val generateFmj = tasks.register("generateFmj", GenerateFmjTask::class) {
 			.withIcon("assets/${Constants.NAMESPACE}/icon.png")
 			.withEnvironment("client")
 			.withDepend("fabricloader", ">=${libs.versions.fabric.loader.get()}")
-			.withDepend("minecraft", "~1.21 >=1.21.2-")
+			.withDepend("minecraft", "~1.21.2 >=1.21.2-")
 			.withDepend("java", ">=${Constants.JAVA_VERSION}")
 			.withModMenu {
 				it.withLink("modmenu.curseforge", "https://www.curseforge.com/minecraft/mc-mods/lambdynamiclights")
@@ -38,7 +38,6 @@ val generateFmj = tasks.register("generateFmj", GenerateFmjTask::class) {
 					.withLink("modmenu.github_releases", "${Constants.SOURCES_LINK}/releases")
 					.withLink("modmenu.modrinth", "https://modrinth.com/mod/lambdynamiclights")
 					.withLink("modmenu.bluesky", "https://bsky.app/profile/lambdaurora.dev")
-					.withLink("modmenu.twitter", "https://twitter.com/LambdAurora")
 			}
 	)
 	outputDir.set(project.file("build/generated/generated_resources/"))

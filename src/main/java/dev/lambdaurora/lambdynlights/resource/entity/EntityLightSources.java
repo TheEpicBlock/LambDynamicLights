@@ -53,6 +53,9 @@ public final class EntityLightSources extends LightSourceLoader<EntityLightSourc
 	public static final EntityLuminance.Type CREEPER = EntityLuminance.Type.registerSimple(
 			LambDynLightsConstants.id("creeper"), CreeperLuminance.INSTANCE
 	);
+	public static final EntityLuminance.Type GLOW_SQUID =EntityLuminance.Type.registerSimple(
+			LambDynLightsConstants.id("glow_squid"), GlowSquidLuminance.INSTANCE
+	);
 	public static final EntityLuminance.Type MAGMA_CUBE = EntityLuminance.Type.registerSimple(
 			LambDynLightsConstants.id("magma_cube"), MagmaCubeLuminance.INSTANCE
 	);

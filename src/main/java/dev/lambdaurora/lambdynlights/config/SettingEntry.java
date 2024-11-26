@@ -19,12 +19,14 @@ import java.util.function.Consumer;
 public abstract class SettingEntry<T> {
 	private final String key;
 	private final SpruceOption option;
+	private final T defaultValue;
 	protected @Nullable Config config;
 	private T value;
 	protected @Nullable Consumer<T> onSet;
 
 	protected SettingEntry(String key, T defaultValue, @Nullable Config config, @Nullable Text tooltip) {
 		this.key = key;
+		this.defaultValue = defaultValue;
 		this.config = config;
 		this.option = this.buildOption(tooltip);
 		this.value = defaultValue;
@@ -49,6 +51,10 @@ public abstract class SettingEntry<T> {
 			this.onSet.accept(value);
 
 		this.save();
+	}
+
+	public void reset() {
+		this.set(this.defaultValue);
 	}
 
 	protected abstract void deserialize(Object obj);

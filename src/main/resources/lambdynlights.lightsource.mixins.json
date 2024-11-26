@@ -1,16 +1,19 @@
 {
-  "required": true,
-  "package": "dev.lambdaurora.lambdynlights.mixin.lightsource",
-  "compatibilityLevel": "JAVA_21",
-  "client": [
-    "AbstractMinecartEntityMixin",
-    "EntityMixin",
-    "FallingBlockEntityMixin",
-    "LivingEntityMixin",
-    "PlayerEntityMixin",
-    "PrimedTntEntityMixin"
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  }
+	"required": true,
+	"package": "dev.lambdaurora.lambdynlights.mixin.lightsource",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"AbstractMinecartEntityMixin",
+		"BeaconBlockEntityMixin",
+		"EntityMixin",
+		"FallingBlockEntityMixin",
+		"GuardianEntityMixin",
+		"LivingEntityMixin",
+		"PlayerEntityMixin",
+		"PrimedTntEntityMixin",
+		"TheEndGatewayBlockEntityMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
 }

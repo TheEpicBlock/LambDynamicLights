@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 /**
- * Represents the luminance value of a magma cube.
+ * Provides the luminance value of a magma cube.
  *
  * @author LambdAurora
  * @version 4.0.0

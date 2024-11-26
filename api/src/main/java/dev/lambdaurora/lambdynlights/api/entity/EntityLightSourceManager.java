@@ -29,6 +29,7 @@ import java.util.Optional;
  *
  * @author LambdAurora
  * @version 4.0.0
+ * @see EntityLightSource
  * @since 4.0.0
  */
 public interface EntityLightSourceManager {

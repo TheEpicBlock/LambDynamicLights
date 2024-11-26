@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 /**
- * Represents the luminance value of an enderman.
+ * Provides the luminance value of an enderman.
  *
  * @author LambdAurora
  * @version 4.0.0
